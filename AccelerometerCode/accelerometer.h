@@ -10,7 +10,10 @@
 
 void initAcc();
 void getSamples();
-void acc_ISR();
+void accStartST();
+void accEndST();
+void accSleep();
+void accWakeup();
 
 
 #endif /* ACCELEROMETER_H_ */

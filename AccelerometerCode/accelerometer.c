@@ -9,6 +9,9 @@
 
 void initAcc() {
 
+	// Turn on Accelerometer
+	P4OUT |= BIT4;
+
 	// Configure ADC
 	P4SEL1 |= BIT1 | BIT0 | BIT2;
 	P4SEL0 |= BIT1 | BIT0 | BIT2;
@@ -22,16 +25,16 @@ void initAcc() {
 	//ADC12CTL2 |= ADC12PWRMD; //ADC LPM.  Samples cannot exceed 50ksps
 
 	//Select ADC memory registers and input
-	ADC12MCTL0 |= ADC12INCH_8 | ADC12VRSEL_9;  // A8 ADC input select; Vref=AVCC; Vref-=1.2
-	ADC12MCTL1 |= ADC12INCH_9 | ADC12VRSEL_9;  // A9 ADC input select; Vref=AVCC
-	ADC12MCTL2 |= ADC12INCH_10 | ADC12VRSEL_9; // A10 ADC input select; Vref=AVCC
+	ADC12MCTL0 |= ADC12INCH_8;// | ADC12VRSEL_9;  // A8 ADC input select; Vref=AVCC; Vref-=1.2
+	ADC12MCTL1 |= ADC12INCH_9;// | ADC12VRSEL_9;  // A9 ADC input select; Vref=AVCC
+	ADC12MCTL2 |= ADC12INCH_10;	// | ADC12VRSEL_9; // A10 ADC input select; Vref=AVCC
 }
 
 void getSamples() {
 	volatile unsigned int xSample = 0, ySample = 0, zSample = 0;
 	volatile unsigned int i = 0;
 
-	while (i < 4) {
+	while (i < 8) {
 
 		ADC12CTL3 &= ~0x1F;
 		ADC12CTL0 |= ADC12ENC | ADC12SC;        // Start sampling/conversion
@@ -39,7 +42,6 @@ void getSamples() {
 			;
 		xSample += ADC12MEM0;
 		ADC12CTL0 &= ~ADC12ENC;
-
 
 		ADC12CTL3 = 0x1;
 		ADC12CTL0 |= ADC12ENC | ADC12SC;         // Start sampling/conversion
@@ -58,10 +60,35 @@ void getSamples() {
 		i = i + 1;
 	}
 
-	xSample = xSample >> 2;
-	ySample = ySample >> 2;
-	zSample = zSample >> 2;
+	xSample = xSample >> 3;
+	ySample = ySample >> 3;
+	zSample = zSample >> 3;
 
+	/*if (xSample > 2270 || ySample > 2270 || zSample > 2270) {
+		P1OUT |= BIT0;
+		__delay_cycles(50000);
+	} else {
+		P1OUT &= ~BIT0;
+		__delay_cycles(50000);
+	}*/
+}
+
+void accSleep() {
+	P4OUT &= ~BIT4; // Turn off Accelerometer Switch
+	ADC12CTL0 &= ~ADC12ON; // Turn off ADC
+}
+
+void accWakeup() {
+	P4OUT |= BIT4; // Turn on Accelerometer Switch
+	ADC12CTL0 |= ADC12ON; // Turn off ADC
+}
+
+void accStartST() {
+	P4OUT |= BIT3; // Turn on Self Test Bit
+}
+
+void accEndST() {
+	P4OUT &= ~BIT3; // Turn off Self Test Bit
 }
 
 //void acc_ISR() {
