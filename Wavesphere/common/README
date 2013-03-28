@@ -1,0 +1,7 @@
+accelerometer/README.txt
+
+Author: Samuel
+
+This folder contains all code that is common to more than one module. Eg common libraries like SPI, I2C, UART
+communications, etc.
+
