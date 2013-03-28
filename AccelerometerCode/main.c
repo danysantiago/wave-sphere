@@ -32,10 +32,10 @@ void main() {
 	}
 }
 
-#pragma vector = ADC12_VECTOR
-__interrupt void ADC12_ISR(void){
-	acc_ISR();
-}
+//#pragma vector = ADC12_VECTOR
+//__interrupt void ADC12_ISR(void){
+//	acc_ISR();
+//}
 
 //#pragma vector=TIMER1_A0_VECTOR
 //__interrupt void TIMER1_A0_ISR(void) {
