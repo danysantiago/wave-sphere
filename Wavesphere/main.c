@@ -8,7 +8,9 @@
  */
 
 #include <msp430fr5969.h>
+#include "main.h"
 
+#ifndef DEBUG
 int main(void) {
 	WDTCTL = WDTPW | WDTHOLD;		// Stop watchdog timer
 	P1DIR |= 0x01;					// Set P1.0 to output direction
@@ -25,3 +27,4 @@ int main(void) {
 	
 	return 0;
 }
+#endif
