@@ -25,7 +25,7 @@ void setup() {
 	CSCTL2 = SELM__DCOCLK + SELS__DCOCLK; // Set MCLK and SMCLK to DCO
 	CSCTL0_H = 0; 					// Lock clock registers
 
-	P3DIR |= BIT4;	// CS initially disabled (it is active low)
+	P3DIR |= BIT4;
 	P3SEL1 |= BIT4; // output SMCLK for measurement on P3.4
 }
 

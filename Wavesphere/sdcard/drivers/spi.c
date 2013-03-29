@@ -22,7 +22,7 @@
 void spi_initialize(void)
 {
 	UCA0CTLW0 |= UCSWRST;			// Put state machine in reset
-	UCA0CTLW0 |= SPI_MODE_0			// 3-pin, 8-bit SPI master
+	UCA0CTLW0 |= SPI_MODE_0;		// 3-pin, 8-bit SPI master
 									// Clock polarity high, MSB
 	UCA0CTLW0 |= UCSSEL_2;			// SMCLK
 									// source USCI clock from SMCLK, put USCI in reset mode
@@ -35,7 +35,7 @@ void spi_initialize(void)
 	UCA0BR0 = LOBYTE(SPI_400kHz);	// set initial speed 16MHz/400000 = 400kHz as needed by SD card
 	UCA0BR1 = HIBYTE(SPI_400kHz);
 
-	P3OUT |= BIT2;					// CS on P3.2. start out disabled
+	P3OUT |= BIT2;					// CS on P3.2. start out disabled (it is active low)
 	P3DIR |= BIT2;					// CS configured as output
 
 	UCA0CTLW0 &= ~UCSWRST;			// release for operation
@@ -74,7 +74,7 @@ uint8_t spi_receive(void) {
 }
 
 /**
- * spi_setspeed() - set new clock divider for USCI
+ * spi_set_divisor() - set new clock divider for USCI
  *
  * USCI speed is based on the SMCLK divided by BR0 and BR1
  * initially we start slow (400kHz) to conform to SDCard
