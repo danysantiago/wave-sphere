@@ -113,9 +113,17 @@ int main(void)
   UCB0CTL1 &= ~UCSWRST;                     // **Initialize USCI state machine**
 
 
+  // with SPI initialized and everything in order, wait a bit.
+  __delay_cycles(1000);
   // now with SPI initialized, select slave...
   SELECT();
-  data = readByte(0x8F);
+  sendByte(0x20,0x0F);
+  DESELECT();
+
+  __delay_cycles(5000);
+
+  SELECT();
+  data = readByte(0x8F); // should retur 0xD4
   DESELECT();
 
   __no_operation(); // for debugging
