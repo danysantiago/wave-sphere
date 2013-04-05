@@ -1,0 +1,1 @@
+"./drivers/spi.obj" "./pff2a/src/pff.obj" "./pff2a/src/diskio.obj" "./print/print.obj" "./softserial.obj" "./main.obj" -l"libc.a" "../lnk_msp430g2553.cmd" 
