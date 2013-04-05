@@ -87,8 +87,11 @@
 
 void sendByte(const unsigned char address, const unsigned char data);
 unsigned char readByte(const unsigned char address);
+void readMultipleBytes(const unsigned char address, const unsigned char n, unsigned char *arr);
 
-volatile unsigned char data; // to prevent compiler optimizations
+//volatile unsigned char datax, datay, dataz; // to prevent compiler optimizations
+volatile unsigned char data;
+unsigned char arr[6];
 
 int main(void)
 {
@@ -123,8 +126,15 @@ int main(void)
   __delay_cycles(5000);
 
   SELECT();
-  data = readByte(0x8F); // should retur 0xD4
+  data = readByte(0x8F); // should returN 0xD4
   DESELECT();
+
+  __delay_cycles(5000);
+  SELECT();
+  readMultipleBytes(0xE8, 6, arr);
+  DESELECT();
+  //print(arr);
+
 
   __no_operation(); // for debugging
   __no_operation();
@@ -152,4 +162,19 @@ unsigned char readByte(const unsigned char address) {
 	// wait for receive byte
 	while(!(UCB0IFG & UCRXIFG)); // wait for rx buffer
 	return UCB0RXBUF;
+}
+
+void readMultipleBytes(const unsigned char address, const unsigned char n, unsigned char *arr) {
+	int i;
+	// reads the amount of bytes given by n at the address
+	while (!(UCB0IFG&UCTXIFG)); // UCB0 tx buffer ready?
+		UCB0TXBUF = address; // send first address byte
+
+	// now send n dummy bits
+	for(i = 0; i < n; i++) {
+		while(!(UCB0IFG&UCTXIFG));
+			UCB0TXBUF = 0x00;
+		while(!(UCB0IFG & UCRXIFG)); // wait for rx buffer
+			arr[i] = UCB0RXBUF;
+	}
 }
