@@ -81,6 +81,8 @@
 //******************************************************************************
 
 #include <msp430.h>
+#include <stdio.h>
+#include <string.h>
 
 #define SELECT()	P3OUT &= ~BIT0				// CS = L
 #define DESELECT()	P3OUT |= BIT0				//CS = H
@@ -88,8 +90,9 @@
 void sendByteSPI(const unsigned char address, const unsigned char data);
 unsigned char readByteSPI(const unsigned char address);
 void readMultipleBytesSPI(const unsigned char address, const unsigned char n, unsigned char *arr);
-void sendByteUART(char byte);
-void sendStringUART(char *string);
+void sendByteUART(unsigned char byte);
+void sendStringUART(char *arr);
+void sendOurDataUART(unsigned char *arr);
 
 //volatile unsigned char datax, datay, dataz; // to prevent compiler optimizations
 volatile unsigned char data;
@@ -142,11 +145,15 @@ int main(void)
   DESELECT();
 
   __delay_cycles(5000);
-  SELECT();
-  readMultipleBytesSPI(0xE8, 6, arr);
-  DESELECT();
+  while(1) {
+	  SELECT();
+	  readMultipleBytesSPI(0xE8, 6, arr);
+	  DESELECT();
 
-  sendStringUART(arr);
+	  sendOurDataUART(arr);
+	  __delay_cycles(1500000);
+  }
+
 
   __no_operation(); // for debugging
   __no_operation();
@@ -189,14 +196,28 @@ void readMultipleBytesSPI(const unsigned char address, const unsigned char n, un
 		while(!(UCB0IFG & UCRXIFG)); // wait for rx buffer
 			arr[i] = UCB0RXBUF;
 	}
+	__delay_cycles(35);
 }
 
-void sendByteUART(char byte) {
+void sendByteUART(unsigned char byte) {
 	while(!(UCA0IFG & UCTXIFG)); // wait for buffer availability (TX)
 	UCA0TXBUF = byte;
 }
 
+void sendOurDataUART(unsigned char *arr) {
+	unsigned int i;
+	char axis[3] = {'x', 'y', 'z'};
+	char string[30];
+
+	for (i = 0; i < 3; i++) {
+		sprintf(string, "%c: %d%c\n",axis[i], arr[i*2] + (arr[i*2+1] << 8), (i==2) ? '\n' : ' ');
+		sendStringUART(string);
+	}
+}
+
 void sendStringUART(char *string) {
-	for(; *string; string++)
+	while(*string) {
 		sendByteUART(*string);
+		string++;
+	}
 }
