@@ -22,3 +22,6 @@
 #*.project
 #*.cproject
 #*.cssproject
+
+#Debug Folder
+*/Debug
