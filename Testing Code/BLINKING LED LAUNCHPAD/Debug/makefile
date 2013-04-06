@@ -2,9 +2,7 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-SHELL = cmd.exe
-
-CG_TOOL_ROOT := C:/ti/ccsv5/tools/compiler/msp430_4.1.2
+CG_TOOL_ROOT := /opt/ti/ccsv5/tools/compiler/msp430_4.1.2
 
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
@@ -14,8 +12,8 @@ $(GEN_CMDS__FLAG) \
 
 -include ../makefile.init
 
-RM := DEL /F
-RMDIR := RMDIR /S/Q
+RM := rm -rf
+RMDIR := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
@@ -115,7 +113,7 @@ all: BLINKING\ LED\ LAUNCHPAD.out
 BLINKING\ LED\ LAUNCHPAD.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv5/tools/compiler/msp430_4.1.2/bin/cl430" -vmsp --abi=eabi -g --advice:power=all --define=__MSP430G2553__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z --stack_size=80 -m"BLINKING LED LAUNCHPAD.map" --heap_size=80 -i"C:/ti/ccsv5/ccs_base/msp430/include" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.2/lib" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --rom_model -o "BLINKING LED LAUNCHPAD.out" $(ORDERED_OBJS)
+	"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/bin/cl430" -vmsp --abi=eabi -g --advice:power=all --define=__MSP430G2553__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z --stack_size=80 -m"BLINKING LED LAUNCHPAD.map" --heap_size=80 -i"/opt/ti/ccsv5/ccs_base/msp430/include" -i"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/lib" -i"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --rom_model -o "BLINKING LED LAUNCHPAD.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -13,10 +13,10 @@ C_DEPS += \
 ./drivers/spi.pp 
 
 C_DEPS__QUOTED += \
-"drivers\spi.pp" 
+"drivers/spi.pp" 
 
 OBJS__QUOTED += \
-"drivers\spi.obj" 
+"drivers/spi.obj" 
 
 C_SRCS__QUOTED += \
 "../drivers/spi.c" 

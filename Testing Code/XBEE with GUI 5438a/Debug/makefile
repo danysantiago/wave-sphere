@@ -6,9 +6,9 @@ CG_TOOL_ROOT := /opt/ti/ccsv5/tools/compiler/msp430_4.1.2
 
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
-"./blink.obj" \
+"./main.obj" \
 -l"libc.a" \
-"../lnk_msp430fr5969.cmd" \
+"../lnk_msp430f5438a.cmd" \
 
 -include ../makefile.init
 
@@ -107,21 +107,21 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: FRAM\ write\ example.out
+all: XBEE\ with\ GUI\ 5438a.out
 
 # Tool invocations
-FRAM\ write\ example.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+XBEE\ with\ GUI\ 5438a.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/bin/cl430" -vmspx --abi=eabi -g --advice:power=all --define=__MSP430FR5969__ --diag_warning=225 --display_error_number --diag_wrap=off --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU40 --printf_support=minimal -z --stack_size=160 -m"FRAM write example.map" --heap_size=160 --use_hw_mpy=F5 -i"/opt/ti/ccsv5/ccs_base/msp430/include" -i"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/lib" -i"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --rom_model -o "FRAM write example.out" $(ORDERED_OBJS)
+	"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/bin/cl430" -vmspx --abi=eabi -g --advice:power=all --define=__MSP430F5438A__ --diag_warning=225 --display_error_number --diag_wrap=off --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU23 --silicon_errata=CPU40 --printf_support=minimal -z --stack_size=160 -m"XBEE with GUI 5438a.map" --heap_size=160 --use_hw_mpy=F5 -i"/opt/ti/ccsv5/ccs_base/msp430/include" -i"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/lib" -i"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --rom_model -o "XBEE with GUI 5438a.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(MSP430_EXECUTABLE_OUTPUTS__QUOTED) "FRAM write example.out"
-	-$(RM) "blink.pp" 
-	-$(RM) "blink.obj" 
+	-$(RM) $(MSP430_EXECUTABLE_OUTPUTS__QUOTED) "XBEE with GUI 5438a.out"
+	-$(RM) "main.pp" 
+	-$(RM) "main.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

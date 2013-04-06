@@ -85,8 +85,8 @@
 #define DESELECT()	P3OUT &= ~BIT0				// CS = L
 #define SELECT()	P3OUT |= BIT0				//CS = H
 
-void sendByte(const unsigned char address, const unsigned char data);
-unsigned char readByte(const unsigned char address);
+void sendByteSPI(const unsigned char address, const unsigned char data);
+unsigned char readByteSPI(const unsigned char address);
 void toggleTecato(void);
 
 volatile unsigned char data; // to prevent compiler optimizations
@@ -119,7 +119,7 @@ int main(void)
   // now with SPI initialized, select slave...
   SELECT();
 
-  data = readByte(0x40);
+  data = readByteSPI(0x40);
   __delay_cycles(50);
 
   toggleTecato();
@@ -170,15 +170,15 @@ void toggleTecato(void) {
 	__delay_cycles(100);
 	SELECT();
 }
-void sendByte(const unsigned char address, const unsigned char data) {
+void sendByteSPI(const unsigned char address, const unsigned char data) {
 	while (!(UCB0IFG&UCTXIFG)); // UCB0 tx buffer ready?
 	UCB0TXBUF = address;
 	while (!(UCB0IFG&UCTXIFG)); // UCB0 tx buffer ready?
 	UCB0TXBUF = data;
 }
 
-unsigned char readByte(const unsigned char address) {
-	sendByte(address, 0x00); // dummy byte
+unsigned char readByteSPI(const unsigned char address) {
+	sendByteSPI(address, 0x00); // dummy byte
 
 	// wait for receive byte
 	while(!(UCB0IFG & UCRXIFG)); // wait for rx buffer

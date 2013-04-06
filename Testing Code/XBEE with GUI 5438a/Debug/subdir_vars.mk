@@ -3,22 +3,25 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
+CMD_SRCS += \
+../lnk_msp430f5438a.cmd 
+
 C_SRCS += \
-../print/print.c 
+../main.c 
 
 OBJS += \
-./print/print.obj 
+./main.obj 
 
 C_DEPS += \
-./print/print.pp 
+./main.pp 
 
 C_DEPS__QUOTED += \
-"print/print.pp" 
+"main.pp" 
 
 OBJS__QUOTED += \
-"print/print.obj" 
+"main.obj" 
 
 C_SRCS__QUOTED += \
-"../print/print.c" 
+"../main.c" 
 
 

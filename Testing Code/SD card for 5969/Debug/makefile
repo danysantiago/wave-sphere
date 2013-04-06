@@ -2,9 +2,7 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-SHELL = cmd.exe
-
-CG_TOOL_ROOT := C:/ti/ccsv5/tools/compiler/msp430_4.1.2
+CG_TOOL_ROOT := /opt/ti/ccsv5/tools/compiler/msp430_4.1.2
 
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
@@ -17,8 +15,8 @@ $(GEN_CMDS__FLAG) \
 
 -include ../makefile.init
 
-RM := DEL /F
-RMDIR := RMDIR /S/Q
+RM := rm -rf
+RMDIR := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
@@ -122,15 +120,15 @@ all: SD\ card\ for\ 5969.out
 SD\ card\ for\ 5969.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv5/tools/compiler/msp430_4.1.2/bin/cl430" -vmspx --abi=eabi -g --advice:power=all --define=__MSP430FR5969__ --diag_warning=225 --display_error_number --diag_wrap=off --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU40 --printf_support=minimal -z --stack_size=160 -m"SD card for 5969.map" --heap_size=160 --use_hw_mpy=F5 -i"C:/ti/ccsv5/ccs_base/msp430/include" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.2/lib" -i"C:/ti/ccsv5/tools/compiler/msp430_4.1.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --rom_model -o "SD card for 5969.out" $(ORDERED_OBJS)
+	"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/bin/cl430" -vmspx --abi=eabi -g --advice:power=all --define=__MSP430FR5969__ --diag_warning=225 --display_error_number --diag_wrap=off --silicon_errata=CPU21 --silicon_errata=CPU22 --silicon_errata=CPU40 --printf_support=minimal -z --stack_size=160 -m"SD card for 5969.map" --heap_size=160 --use_hw_mpy=F5 -i"/opt/ti/ccsv5/ccs_base/msp430/include" -i"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/lib" -i"/opt/ti/ccsv5/tools/compiler/msp430_4.1.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --rom_model -o "SD card for 5969.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(MSP430_EXECUTABLE_OUTPUTS__QUOTED) "SD card for 5969.out"
-	-$(RM) "main.pp" "pff2a\src\diskio.pp" "pff2a\src\pff.pp" "drivers\spi.pp" 
-	-$(RM) "main.obj" "pff2a\src\diskio.obj" "pff2a\src\pff.obj" "drivers\spi.obj" 
+	-$(RM) "main.pp" "pff2a/src/diskio.pp" "pff2a/src/pff.pp" "drivers/spi.pp" 
+	-$(RM) "main.obj" "pff2a/src/diskio.obj" "pff2a/src/pff.obj" "drivers/spi.obj" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
