@@ -1,1 +1,0 @@
-"./mmc.obj" "./hal_SPI.obj" "./blink.obj" -l"libc.a" "../lnk_msp430fr5969.cmd" 
