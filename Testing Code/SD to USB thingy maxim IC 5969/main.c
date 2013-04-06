@@ -32,7 +32,7 @@ void setup() {
 	P1DIR |= BIT3; // as output
 	P1DIR &= ~BIT1;
 	P1IE |= BIT1; // interrupt de boton en P1.1 para hacer toggle del mode
-	P2DIR &= ~BIT3; // P2.3 as input
+	//P2DIR &= ~BIT3; // P2.3 as input
 }
 
 char line[64]; // serial and general buffer
@@ -77,6 +77,7 @@ void main (void)
 		}
 	}
 
+	pf_mount(NULL);
 	while(1);
 }
 
@@ -84,5 +85,6 @@ void main (void)
 __interrupt void PORT1_ISR(void) {
 	// toggle mode
 	TOGGLE_MODE();
-	__no_operation();
+	P1IFG &= ~BIT1;
+	return;
 }
