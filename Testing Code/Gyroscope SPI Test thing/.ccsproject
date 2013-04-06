@@ -10,4 +10,5 @@
 <linkerCommandFile value="lnk_msp430f5438a.cmd"/>
 <rts value="libc.a"/>
 <templateProperties value="id=com.ti.ccstudio.project.templates.blink_msp430,"/>
+<isTargetManual value="false"/>
 </projectOptions>

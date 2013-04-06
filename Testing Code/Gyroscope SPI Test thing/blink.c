@@ -85,9 +85,11 @@
 #define SELECT()	P3OUT &= ~BIT0				// CS = L
 #define DESELECT()	P3OUT |= BIT0				//CS = H
 
-void sendByte(const unsigned char address, const unsigned char data);
-unsigned char readByte(const unsigned char address);
-void readMultipleBytes(const unsigned char address, const unsigned char n, unsigned char *arr);
+void sendByteSPI(const unsigned char address, const unsigned char data);
+unsigned char readByteSPI(const unsigned char address);
+void readMultipleBytesSPI(const unsigned char address, const unsigned char n, unsigned char *arr);
+void sendByteUART(char byte);
+void sendStringUART(char *string);
 
 //volatile unsigned char datax, datay, dataz; // to prevent compiler optimizations
 volatile unsigned char data;
@@ -101,40 +103,50 @@ int main(void)
   P1OUT |= 0x01;                            // Set P1.0 for LED
                                             // P1.4 is RF input and should be interruptable
   P1DIR |= 0x01;                            // Set P1.0-2 to output direction
-  P3SEL |= BIT1 + BIT2 + BIT3;              // P3.1,2,3 option select
+  P3SEL |= BIT1 + BIT2 + BIT3 + BIT4 + BIT5; // P3.1,2,3,4,5 option select
   P3DIR |= BIT0;
   DESELECT();
 
+  //UCB0 is SPI
   UCB0CTL1 |= UCSWRST;                      // **Put state machine in reset**
-  UCB0CTL0 |= UCMST+UCSYNC+UCMSB;    // 3-pin, 8-bit SPI master
+  UCB0CTL0 |= UCMST+UCSYNC+UCMSB;    		// 3-pin, 8-bit SPI master
   UCB0CTL0 |= UCCKPL;
                                             // Clock polarity high, MSB
   UCB0CTL1 |= UCSSEL_2;                     // SMCLK
-  UCB0BR0 = 0x04;                           // /4 ? ANTES ERA 0x02
+  UCB0BR0 = 0x04;                           // /4 ? ANTES ERA 0x02 Bitch, cuz we want slow clock to be cool
   UCB0BR1 = 0;                              //
 //  UCB0MCTL = 0;                             // No modulation
   UCB0CTL1 &= ~UCSWRST;                     // **Initialize USCI state machine**
+  
+  //UCA0 is UART
+  UCA0CTL1 |= UCSWRST;                      // **Put state machine in reset**
+  UCA0CTL1 |= UCSSEL_2;                     // SMCLK
+  UCA0BR0 = 109;                            // 1MHz 9600 (see User's Guide)
+  UCA0BR1 = 0;                              // 1MHz 9600
+  UCA0MCTL |= UCBRS_2 + UCBRF_0;            // Modulation UCBRSx=2, UCBRFx=0
+  UCA0CTL1 &= ~UCSWRST;                     // **Initialize USCI state machine**
+//  UCA0IE |= UCRXIE;                         // Enable USCI_A0 RX interrupt
 
 
-  // with SPI initialized and everything in order, wait a bit.
+  // with SPI and UART initialized and everything in order, wait a bit.
   __delay_cycles(1000);
   // now with SPI initialized, select slave...
   SELECT();
-  sendByte(0x20,0x0F);
+  sendByteSPI(0x20,0x0F);
   DESELECT();
 
   __delay_cycles(5000);
 
   SELECT();
-  data = readByte(0x8F); // should returN 0xD4
+  data = readByteSPI(0x8F); // should return 0xD4
   DESELECT();
 
   __delay_cycles(5000);
   SELECT();
-  readMultipleBytes(0xE8, 6, arr);
+  readMultipleBytesSPI(0xE8, 6, arr);
   DESELECT();
-  //print(arr);
 
+  sendStringUART(arr);
 
   __no_operation(); // for debugging
   __no_operation();
@@ -147,7 +159,7 @@ int main(void)
 
 }
 
-void sendByte(const unsigned char address, const unsigned char data) {
+void sendByteSPI(const unsigned char address, const unsigned char data) {
 	while (!(UCB0IFG&UCTXIFG)); // UCB0 tx buffer ready?
 	UCB0TXBUF = address;
 	while (!(UCB0IFG&UCTXIFG)); // UCB0 tx buffer ready?
@@ -156,15 +168,15 @@ void sendByte(const unsigned char address, const unsigned char data) {
 	__delay_cycles(25);
 }
 
-unsigned char readByte(const unsigned char address) {
-	sendByte(address, 0x00); // dummy byte
+unsigned char readByteSPI(const unsigned char address) {
+	sendByteSPI(address, 0x00); // dummy byte
 
 	// wait for receive byte
 	while(!(UCB0IFG & UCRXIFG)); // wait for rx buffer
 	return UCB0RXBUF;
 }
 
-void readMultipleBytes(const unsigned char address, const unsigned char n, unsigned char *arr) {
+void readMultipleBytesSPI(const unsigned char address, const unsigned char n, unsigned char *arr) {
 	int i;
 	// reads the amount of bytes given by n at the address
 	while (!(UCB0IFG&UCTXIFG)); // UCB0 tx buffer ready?
@@ -177,4 +189,14 @@ void readMultipleBytes(const unsigned char address, const unsigned char n, unsig
 		while(!(UCB0IFG & UCRXIFG)); // wait for rx buffer
 			arr[i] = UCB0RXBUF;
 	}
+}
+
+void sendByteUART(char byte) {
+	while(!(UCA0IFG & UCTXIFG)); // wait for buffer availability (TX)
+	UCA0TXBUF = byte;
+}
+
+void sendStringUART(char *string) {
+	for(; *string; string++)
+		sendByteUART(*string);
 }

@@ -1,7 +1,7 @@
 ******************************************************************************
-                  MSP430 Linker PC v4.1.2                      
+                  MSP430 Linker Unix v4.1.2                    
 ******************************************************************************
->> Linked Fri Apr 05 17:22:02 2013
+>> Linked Fri Apr  5 19:51:40 2013
 
 OUTPUT FILE NAME:   <Gyroscope SPI Test thing.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 00005c00
@@ -19,7 +19,7 @@ MEMORY CONFIGURATION
   INFOB                 00001900   00000080  00000000  00000080  RWIX
   INFOA                 00001980   00000080  00000000  00000080  RWIX
   RAM                   00001c00   00004000  000000a8  00003f58  RWIX
-  FLASH                 00005c00   0000a380  00000200  0000a180  RWIX
+  FLASH                 00005c00   0000a380  0000024c  0000a134  RWIX
   INT00                 0000ff80   00000002  00000000  00000002  RWIX
   INT01                 0000ff82   00000002  00000000  00000002  RWIX
   INT02                 0000ff84   00000002  00000000  00000002  RWIX
@@ -109,20 +109,22 @@ section   page    origin      length       input sections
 *          0    00005c00    0000001a     
                   00005c00    0000001a     rts430x_lc_sd_eabi.lib : boot.obj (.text:_isr:_c_int00_noexit)
 
-.text      0    00005c1a    000001d4     
-                  00005c1a    000000b6     blink.obj (.text:main)
-                  00005cd0    0000006e     rts430x_lc_sd_eabi.lib : autoinit.obj (.text:_auto_init)
-                  00005d3e    00000038                            : copy_zero_init.obj (.text:decompress:ZI:__TI_zero_init)
-                  00005d76    00000036     blink.obj (.text:readMultipleBytes)
-                  00005dac    00000028     blink.obj (.text:sendByte)
-                  00005dd4    00000012     blink.obj (.text:readByte)
-                  00005de6    00000004     rts430x_lc_sd_eabi.lib : pre_init.obj (.text:_system_pre_init)
-                  00005dea    00000004                            : exit.obj (.text:abort)
+.text      0    00005c1a    00000220     
+                  00005c1a    000000e2     blink.obj (.text:main)
+                  00005cfc    0000006e     rts430x_lc_sd_eabi.lib : autoinit.obj (.text:_auto_init)
+                  00005d6a    00000038                            : copy_zero_init.obj (.text:decompress:ZI:__TI_zero_init)
+                  00005da2    00000036     blink.obj (.text:readMultipleBytesSPI)
+                  00005dd8    00000028     blink.obj (.text:sendByteSPI)
+                  00005e00    00000014     blink.obj (.text:sendStringUART)
+                  00005e14    00000012     blink.obj (.text:readByteSPI)
+                  00005e26    0000000c     blink.obj (.text:sendByteUART)
+                  00005e32    00000004     rts430x_lc_sd_eabi.lib : pre_init.obj (.text:_system_pre_init)
+                  00005e36    00000004                            : exit.obj (.text:abort)
 
-.cinit     0    00005dee    00000012     
-                  00005dee    00000006     (.cinit..bss.load) [load image, compression = zero_init]
-                  00005df4    00000004     (__TI_handler_table)
-                  00005df8    00000008     (__TI_cinit_table)
+.cinit     0    00005e3a    00000012     
+                  00005e3a    00000006     (.cinit..bss.load) [load image, compression = zero_init]
+                  00005e40    00000004     (__TI_handler_table)
+                  00005e44    00000008     (__TI_cinit_table)
 
 .reset     0    0000fffe    00000002     
                   0000fffe    00000002     rts430x_lc_sd_eabi.lib : boot.obj (.reset)
@@ -130,13 +132,13 @@ section   page    origin      length       input sections
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 00005df8 records: 1, size/record: 8, table size: 8
-	.bss: load addr=00005dee, load size=00000006 bytes, run addr=00001c00, run size=00000008 bytes, compression=zero_init
+__TI_cinit_table @ 00005e44 records: 1, size/record: 8, table size: 8
+	.bss: load addr=00005e3a, load size=00000006 bytes, run addr=00001c00, run size=00000008 bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 00005df4 records: 1, size/record: 4, table size: 4
+__TI_handler_table @ 00005e40 records: 1, size/record: 4, table size: 4
 	index: 0, handler: __TI_zero_init
 
 
@@ -226,7 +228,7 @@ address    name
 00000732   ADC12MEM9
 00000733   ADC12MEM9_H
 00000732   ADC12MEM9_L
-00005dea   C$$EXIT
+00005e36   C$$EXIT
 00000150   CRCDI
 00000152   CRCDIRB
 00000153   CRCDIRB_H
@@ -821,31 +823,33 @@ address    name
 0000015c   WDTCTL_L
 00005c00   __STACK_END
 000000a0   __STACK_SIZE
-00005df8   __TI_CINIT_Base
-00005e00   __TI_CINIT_Limit
-00005df4   __TI_Handler_Table_Base
-00005df8   __TI_Handler_Table_Limit
+00005e44   __TI_CINIT_Base
+00005e4c   __TI_CINIT_Limit
+00005e40   __TI_Handler_Table_Base
+00005e44   __TI_Handler_Table_Limit
 UNDEFED    __TI_INITARRAY_Base
 UNDEFED    __TI_INITARRAY_Limit
 00000001   __TI_args_main
 00000001   __TI_exit
-00005d3e   __TI_zero_init
+00005d6a   __TI_zero_init
 ffffffff   __binit__
 ffffffff   __c_args__
-00005cd0   _auto_init
+00005cfc   _auto_init
 00005c00   _c_int00
 00005c00   _c_int00_noexit
 0000fffe   _reset_vector
 00005b60   _stack
-00005de6   _system_pre_init
-00005dea   abort
+00005e32   _system_pre_init
+00005e36   abort
 00001c02   arr
 ffffffff   binit
 00001c00   data
 00005c1a   main
-00005dd4   readByte
-00005d76   readMultipleBytes
-00005dac   sendByte
+00005e14   readByteSPI
+00005da2   readMultipleBytesSPI
+00005dd8   sendByteSPI
+00005e26   sendByteUART
+00005e00   sendStringUART
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -1536,18 +1540,20 @@ address    name
 00005c00   _c_int00
 00005c00   _c_int00_noexit
 00005c1a   main
-00005cd0   _auto_init
-00005d3e   __TI_zero_init
-00005d76   readMultipleBytes
-00005dac   sendByte
-00005dd4   readByte
-00005de6   _system_pre_init
-00005dea   C$$EXIT
-00005dea   abort
-00005df4   __TI_Handler_Table_Base
-00005df8   __TI_CINIT_Base
-00005df8   __TI_Handler_Table_Limit
-00005e00   __TI_CINIT_Limit
+00005cfc   _auto_init
+00005d6a   __TI_zero_init
+00005da2   readMultipleBytesSPI
+00005dd8   sendByteSPI
+00005e00   sendStringUART
+00005e14   readByteSPI
+00005e26   sendByteUART
+00005e32   _system_pre_init
+00005e36   C$$EXIT
+00005e36   abort
+00005e40   __TI_Handler_Table_Base
+00005e44   __TI_CINIT_Base
+00005e44   __TI_Handler_Table_Limit
+00005e4c   __TI_CINIT_Limit
 0000fffe   _reset_vector
 ffffffff   __binit__
 ffffffff   __c_args__
@@ -1555,4 +1561,4 @@ ffffffff   binit
 UNDEFED    __TI_INITARRAY_Base
 UNDEFED    __TI_INITARRAY_Limit
 
-[702 symbols]
+[704 symbols]
