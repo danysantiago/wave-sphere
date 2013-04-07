@@ -11,9 +11,9 @@
 #include "pff2a/src/pff.h"
 #include "drivers/spi.h"
 
-#define DESELECT_MODE()	P3OUT &= ~BIT3
-#define SELECT_MODE()	P3OUT |= BIT3
-#define TOGGLE_MODE()	P3OUT ^= BIT3
+#define DESELECT_MODE()	P1OUT &= ~BIT3
+#define SELECT_MODE()	P1OUT |= BIT3
+#define TOGGLE_MODE()	P1OUT ^= BIT3
 /**
  * Seup - initialize timers and clocks
  */
@@ -28,10 +28,11 @@ void setup() {
 	P3DIR |= BIT4;	// CS initially disabled (it is active low)
 	P3SEL1 |= BIT4; // output SMCLK for measurement on P3.4
 	// GPIO sd mode, puerto 1.3
-	P1OUT &= ~BIT3; // output
-	P1DIR |= BIT3;
+	DESELECT_MODE();
+	P1DIR |= BIT3; // as output
 	P1DIR &= ~BIT1;
 	P1IE |= BIT1; // interrupt de boton en P1.1 para hacer toggle del mode
+	//P2DIR &= ~BIT3; // P2.3 as input
 }
 
 char line[64]; // serial and general buffer
@@ -76,6 +77,7 @@ void main (void)
 		}
 	}
 
+	pf_mount(NULL);
 	while(1);
 }
 
@@ -83,5 +85,6 @@ void main (void)
 __interrupt void PORT1_ISR(void) {
 	// toggle mode
 	TOGGLE_MODE();
-	__no_operation();
+	P1IFG &= ~BIT1;
+	return;
 }

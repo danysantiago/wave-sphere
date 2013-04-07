@@ -85,8 +85,8 @@
 #define DESELECT()	P3OUT &= ~BIT0				// CS = L
 #define SELECT()	P3OUT |= BIT0				//CS = H
 
-void sendByte(const unsigned char address, const unsigned char data);
-unsigned char readByte(const unsigned char address);
+void sendByteSPI(const unsigned char address, const unsigned char data);
+unsigned char readByteSPI(const unsigned char address);
 
 volatile unsigned char data; // to prevent compiler optimizations
 
@@ -123,7 +123,7 @@ int main(void)
   */
 
   SELECT();
-  data = readByte(0x01);
+  data = readByteSPI(0x01);
   DESELECT();
 
   __no_operation(); // for debugging
@@ -137,7 +137,7 @@ int main(void)
 
 }
 
-void sendByte(const unsigned char address, const unsigned char data) {
+void sendByteSPI(const unsigned char address, const unsigned char data) {
 	while (!(UCB0IFG&UCTXIFG)); // UCB0 tx buffer ready?
 	UCB0TXBUF = address;
 	while (!(UCB0IFG&UCTXIFG)); // UCB0 tx buffer ready?
@@ -146,8 +146,8 @@ void sendByte(const unsigned char address, const unsigned char data) {
 	__delay_cycles(25);
 }
 
-unsigned char readByte(const unsigned char address) {
-	sendByte(address, 0x00); // dummy byte
+unsigned char readByteSPI(const unsigned char address) {
+	sendByteSPI(address, 0x00); // dummy byte
 
 	// wait for receive byte
 	while(!(UCB0IFG & UCRXIFG)); // wait for rx buffer

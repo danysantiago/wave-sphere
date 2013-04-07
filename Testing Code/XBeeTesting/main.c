@@ -37,14 +37,14 @@ int main(void)
 	}
 }
 
-void send_byte(char byte) {
+void sendByteUART(char byte) {
 	while(!(UCA0IFG & UCTXIFG)); // wait for buffer availability (TX)
 	UCA0TXBUF = byte;
 }
 
-void send_string(char *string) {
+void sendStringUART(char *string) {
 	for(; *string; string++)
-		send_byte(*string);
+		sendByteUART(*string);
 }
 
 void store_data(char c) {
