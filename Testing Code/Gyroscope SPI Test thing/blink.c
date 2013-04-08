@@ -92,11 +92,11 @@ unsigned char readByteSPI(const unsigned char address);
 void readMultipleBytesSPI(const unsigned char address, const unsigned char n, unsigned char *arr);
 void sendByteUART(unsigned char byte);
 void sendStringUART(char *arr);
-void sendOurDataUART(unsigned char *arr);
+void sendGyroDataUART(unsigned char *arr);
 
 //volatile unsigned char datax, datay, dataz; // to prevent compiler optimizations
 volatile unsigned char data;
-unsigned char arr[6];
+unsigned char gyroArr[6];
 
 int main(void)
 {
@@ -147,10 +147,10 @@ int main(void)
   __delay_cycles(5000);
   while(1) {
 	  SELECT();
-	  readMultipleBytesSPI(0xE8, 6, arr);
+	  readMultipleBytesSPI(0xE8, 6, gyroArr);
 	  DESELECT();
 
-	  sendOurDataUART(arr);
+	  sendGyroDataUART(gyroArr);
 	  __delay_cycles(1500000);
   }
 
@@ -204,7 +204,7 @@ void sendByteUART(unsigned char byte) {
 	UCA0TXBUF = byte;
 }
 
-void sendOurDataUART(unsigned char *arr) {
+void sendGyroDataUART(unsigned char *arr) {
 	unsigned int i;
 	char axis[3] = {'x', 'y', 'z'};
 	char string[30];

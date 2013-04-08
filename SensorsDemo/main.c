@@ -2,11 +2,12 @@
 #include "spi.h"
 #include "uartDemo.h"
 #include "accelerometer.h"
-
+#include "i2c.h"
 
 volatile unsigned char data;
 unsigned char gyroArr[6];
 int accArr[3];
+unsigned char magArr[6];
 /*
  * main.c
  */
@@ -23,6 +24,7 @@ void main(void) {
 	initAcc();
 	spiInit(SPI_GYRO_INIT);
 	spiDeselect(ALL);
+	i2c_initialize();
 
 	initTestUART();
 
@@ -50,8 +52,13 @@ void main(void) {
 
 		getAccSamples(accArr);
 
+
+		//Get Mag Data
+		i2c_read_mult_bytes(0x1E, 0x03, 6, magArr);
+
 		sendGyroDataUART(gyroArr);
 		sendAccDataUART(accArr);
+		sendMagDataUART(magArr);
 
 		__delay_cycles(1500000);
 	}

@@ -66,7 +66,8 @@ void sendMagDataUART(unsigned char *arr) {
 	sprintf(string, "Magnetometer\n");
 	sendStringUART(string);
 	for (i = 0; i < 3; i++) {
-		sprintf(string, "%c: %d%c\n", axis[i], arr[i], (i == 2) ? '\n' : ' ');
+		sprintf(string, "%c: %d%c\n", axis[i],
+				arr[i * 2 + 1] + (arr[i * 2] << 8), (i == 2) ? '\n' : ' ');
 		sendStringUART(string);
 	}
 }

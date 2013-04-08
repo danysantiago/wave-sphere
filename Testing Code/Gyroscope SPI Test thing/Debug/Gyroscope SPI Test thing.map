@@ -1,7 +1,7 @@
 ******************************************************************************
                   MSP430 Linker PC v4.1.2                      
 ******************************************************************************
->> Linked Fri Apr 05 20:59:33 2013
+>> Linked Mon Apr 08 00:13:37 2013
 
 OUTPUT FILE NAME:   <Gyroscope SPI Test thing.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 00005c00
@@ -113,7 +113,7 @@ section   page    origin      length       input sections
                   00005c1a    0000010e     rts430x_lc_sd_eabi.lib : _printfi_min.obj (.text:_setfield)
                   00005d28    000000e8     blink.obj (.text:main)
                   00005e10    000000c0     rts430x_lc_sd_eabi.lib : _printfi_min.obj (.text:_printfi_minimal)
-                  00005ed0    00000084     blink.obj (.text:sendOurDataUART)
+                  00005ed0    00000084     blink.obj (.text:sendGyroDataUART)
                   00005f54    0000006e     rts430x_lc_sd_eabi.lib : autoinit.obj (.text:_auto_init)
                   00005fc2    00000052                            : _printfi_min.obj (.text:_ltostr)
                   00006014    0000004c                            : _printfi_min.obj (.text:_pproc_diouxp)
@@ -867,9 +867,9 @@ ffffffff   __c_args__
 00005b60   _stack
 000062aa   _system_pre_init
 000062ae   abort
-00001c02   arr
 ffffffff   binit
 00001c00   data
+00001c02   gyroArr
 00005d28   main
 00006180   memccpy
 00006268   memcpy
@@ -878,7 +878,7 @@ ffffffff   binit
 00006060   readMultipleBytesSPI
 000061a8   sendByteSPI
 0000629e   sendByteUART
-00005ed0   sendOurDataUART
+00005ed0   sendGyroDataUART
 00006242   sendStringUART
 0000611a   sprintf
 0000628c   strlen
@@ -1566,14 +1566,14 @@ address    name
 0000073e   ADC12MEM15_L
 0000073f   ADC12MEM15_H
 00001c00   data
-00001c02   arr
+00001c02   gyroArr
 00005b60   _stack
 00005c00   __STACK_END
 00005c00   _c_int00
 00005c00   _c_int00_noexit
 00005d28   main
 00005e10   _printfi_minimal
-00005ed0   sendOurDataUART
+00005ed0   sendGyroDataUART
 00005f54   _auto_init
 00006060   readMultipleBytesSPI
 000060e2   __TI_zero_init

@@ -122,7 +122,7 @@ __interrupt void USCI_B0_ISR(void)
   case  8: break;                           // Vector  8: STPIFG
   case 10:                                  // Vector 10: RXIFG
 	  RXData = UCB0RXBUF;					//take data from rxbuf
-	  RXByteCtr--;
+	 // RXByteCtr--;
 	  UCB0IFG &= ~UCRXIFG;					//clear rxifg
 
 	  __bic_SR_register_on_exit(LPM0_bits + GIE);
