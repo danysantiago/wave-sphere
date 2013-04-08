@@ -8,6 +8,8 @@
 /*
  * main.c
  */
+#include "spi.h"
+
 int main(void) {
 	  WDTCTL = WDTPW | WDTHOLD;                 // Stop Watchdog
 
@@ -37,6 +39,8 @@ int main(void) {
 	  UCA1CTL1 &= ~UCSWRST;                     // Initialize eUSCI
 	  UCA1IE |= UCRXIE;                         // Enable USCI_A0 RX interrupt
 
+	  // now we should set up the xbee spi thingy
+	  spi_initialize();
 
 	  __no_operation();                         // For debugger
 }
@@ -49,7 +53,7 @@ __interrupt void USCI_A1_ISR(void)
     case USCI_NONE: break;
     case USCI_UART_UCRXIFG:
       while(!(UCA1IFG&UCTXIFG)); // echo instead to xbee when you receive data from the GPS
-      UCA1TXBUF = UCA1RXBUF;
+      spi_send(UCA1RXBUF);
       __no_operation();
       break;
     case USCI_UART_UCTXIFG: break;
