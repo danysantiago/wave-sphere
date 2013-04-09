@@ -19,6 +19,10 @@ int main(void) {
 	CSCTL2 = SELA__VLOCLK + SELS__DCOCLK + SELM__DCOCLK;
 	CSCTL3 = DIVA__1 + DIVS__1 + DIVM__1;     // set all dividers
 
+	// Setup LED Pin
+	P1OUT |= BIT3;
+	P1DIR |= BIT3;
+
 	// Configure UART pins
 	P2REN &= ~(BIT5 + BIT6);
 	P2SEL1 |= BIT5 + BIT6;
@@ -39,7 +43,7 @@ int main(void) {
 	UCA1MCTLW |= UCOS16 | UCBRF_1;
 
 	UCA1CTL1 &= ~UCSWRST;                     // Initialize eUSCI
-	//UCA1IE |= UCRXIE;                         // Enable USCI_A1 RX interrupt
+	UCA1IE |= UCRXIE;                         // Enable USCI_A1 RX interrupt
 
 	_enable_interrupts();
 	_nop();                         // For debugger
@@ -54,3 +58,22 @@ int main(void) {
 	}
 
 }
+
+#pragma vector=USCI_A1_VECTOR
+__interrupt void USCI_A1_ISR(void)
+{
+	unsigned char c;
+  switch(__even_in_range(UCA1IV,USCI_UART_UCTXCPTIFG))
+  {
+    case USCI_NONE: break;
+    case USCI_UART_UCRXIFG:
+      c = UCA1RXBUF;
+      P1OUT = (c << 3);
+      __no_operation();
+      break;
+    case USCI_UART_UCTXIFG: break;
+    case USCI_UART_UCSTTIFG: break;
+    case USCI_UART_UCTXCPTIFG: break;
+  }
+}
+
