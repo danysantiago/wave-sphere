@@ -2,6 +2,7 @@ package edu.uprm.icom5217.wave.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -86,6 +87,8 @@ public class RightPanel2 extends JPanel {
 			samplingModeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					WaveSphere.serial.write(XBee.lang.SAMPLING_MODE);
+					Calendar c = Calendar.getInstance();
+					WaveSphere.serial.write(Long.toString(c.getTimeInMillis()));
 					MainWindow.samplingMode();
 				}
 			});
