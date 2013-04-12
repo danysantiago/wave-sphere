@@ -130,13 +130,13 @@ void i2c_read_mult_bytes(const unsigned char slaveAddr, const unsigned char byte
  * initially we start slow (400kHz) to conform to SDCard
  * specifications then we speed up once initialized (16Mhz)
  *
- */
+ *//*
 void spi_set_divisor(const uint16_t clkdiv) {
 	UCA0CTL1 |= UCSWRST;		// go into reset state
 	UCA0BR0 = LOBYTE(clkdiv);
 	UCA0BR1 = HIBYTE(clkdiv);
 	UCA0CTL1 &= ~UCSWRST;		// release for operation
-}
+}*/
 
 /*#pragma vector = USCI_B0_VECTOR
 __interrupt void USCI_B0_ISR(void) {

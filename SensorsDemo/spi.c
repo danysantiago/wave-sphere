@@ -6,13 +6,14 @@
  */
 #include <msp430fr5969.h>
 #include "spi.h"
+#include <stdint.h>
 
 
 void spiInit(const unsigned int device) {
 	P2SEL1 |= BIT0 + BIT1; //SPI
 	P1SEL1 |= BIT5; // SPI
 
-	P3DIR |= BIT0;
+	P3DIR |= BIT0 + BIT2;
 
 	/*Initialize SPI*/
 	//UCA0 is SPI
@@ -77,6 +78,9 @@ void spiSelect(const unsigned char device) {
 	case GYRO: //GYRO
 		P3OUT &= ~BIT0;
 		break;
+	case SD:
+		P3OUT |= BIT2;
+		break;
 	default:
 		break;
 	}
@@ -88,6 +92,9 @@ void spiDeselect(const unsigned char device) {
 	case GYRO:
 		P3OUT |= BIT0;
 		break;
+	case SD:
+		P3OUT &= ~BIT2;
+		break;
 	case ALL:
 		P3OUT |= BIT0;
 		break;
@@ -97,4 +104,47 @@ void spiDeselect(const unsigned char device) {
 
 }
 
+/**
+ * For SD Card
+ */
+
+uint8_t spi_send(const uint8_t c)
+{
+	while (!(UCA0IFG & UCTXIFG))
+		; // wait for previous tx to complete
+
+	UCA0TXBUF = c; // setting TXBUF clears the TXIFG flag
+
+	while (!(UCA0IFG & UCRXIFG))
+		; // wait for an rx character
+
+	return UCA0RXBUF; // reading clears RXIFG flag
+}
+
+/**
+ * spi_receive() - send dummy btye then recv response
+ */
+uint8_t spi_receive(void) {
+
+	while (!(UCA0IFG & UCTXIFG))
+		; // wait for any previous xmits to complete
+
+	UCA0TXBUF = 0xFF; // Send dummy packet to get data back.
+
+	while (!(UCA0IFG & UCRXIFG))
+		; // wait to recv a character
+
+	return UCA0RXBUF; // reading clears RXIFG flag
+}
+
+void spi_set_divisor(const uint16_t clkdiv)
+{
+	__no_operation();
+	/*
+	UCA0CTL1 |= UCSWRST;		// go into reset state
+	UCA0BR0 = LOBYTE(clkdiv);
+	UCA0BR1 = HIBYTE(clkdiv);
+	UCA0CTL1 &= ~UCSWRST;		// release for operation
+	*/
+}
 
