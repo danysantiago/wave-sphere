@@ -9,6 +9,9 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.xbee.XBee;
+
 import net.miginfocom.swing.MigLayout;
 
 public class RightPanel extends JPanel {
@@ -34,6 +37,7 @@ public class RightPanel extends JPanel {
 			exitButton = new JButton("Exit Retrieval Mode");
 			exitButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					//WaveSphere.serial.print(XBee.lang.STATUS_MODE);
 					MainWindow.normalMode();
 				}
 			});

@@ -10,6 +10,7 @@ public class XBee {
 		public static final int STOP_LOCATE_MODE = '4';
 		public static final int DIAGNOSTIC_MODE = '5';
 		public static final int STOP_DIAGNOSTIC_MODE = '6';
+		public static final int STATUS_MODE = '7';
 
 }
 

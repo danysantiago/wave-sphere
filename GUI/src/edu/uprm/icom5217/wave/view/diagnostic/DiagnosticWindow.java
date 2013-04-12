@@ -161,7 +161,7 @@ public class DiagnosticWindow extends JDialog {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					WaveSphere.serial.write(XBee.lang.STOP_DIAGNOSTIC_MODE);
+					//WaveSphere.serial.write(XBee.lang.STOP_DIAGNOSTIC_MODE);
 					dispose();
 					
 				}

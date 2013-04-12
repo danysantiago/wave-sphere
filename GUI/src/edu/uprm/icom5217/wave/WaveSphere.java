@@ -11,15 +11,13 @@ import edu.uprm.icom5217.wave.xbee.SerialCommunication;
 
 
 public class WaveSphere{
-	public static SerialCommunication serial;
+	//public static SerialCommunication serial = new SerialCommunication();
 
 	private static  MainWindow window;
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
-		serial = new SerialCommunication();
 		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());//might make it look better on Mac
