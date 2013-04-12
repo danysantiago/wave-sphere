@@ -3,11 +3,12 @@ package edu.uprm.icom5217.wave.view;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JPanel;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.JProgressBar;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.Timer;
+
+import net.miginfocom.swing.MigLayout;
 
 public class SamplingWaitScreen extends JPanel{
 	private JProgressBar progressBar;

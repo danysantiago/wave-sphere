@@ -1,15 +1,14 @@
 package edu.uprm.icom5217.wave.view;
 
+import java.awt.Dimension;
 import java.awt.Toolkit;
 
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import net.miginfocom.swing.MigLayout;
-import java.awt.Dimension;
 
 public class MainWindow extends JFrame{
 	
