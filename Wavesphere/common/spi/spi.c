@@ -4,33 +4,28 @@
  *  Created on: Apr 12, 2013
  *      Author: Samuel
  */
-
-
 #include <msp430fr5969.h>
 #include <stdint.h>
 #include "spi.h"
-#include "main.h"
-
+#include "../../main.h"
 
 void spiInit(const unsigned char device) {
-	P2SEL1 |= BIT0 + BIT1; //SPI
-	P1SEL1 |= BIT5; // SPI
+	// Configure ports for SPI
+	P2SEL1 |= BIT0 + BIT1; // data
+	P1SEL1 |= BIT5; // clk
+	P3DIR |= BIT0 + BIT1 + BIT2; // all chip selects as outputs
 
-	P3DIR |= BIT0 + BIT2;
+	// all chips deselected
+	spi_deselect(GYRO);
+	spi_deselect(RF);
+	spi_deselect(SD);
 
-	/*Initialize SPI*/
-	//UCA0 is SPI
-	UCA0CTLW0 |= UCSWRST;                      // **Put state machine in reset**
-	UCA0CTLW0 |= UCMST + UCSYNC;    		// 3-pin, 8-bit SPI master
+	UCA0CTLW0 |= UCSWRST; // put state machine in reset
 
-	UCA0CTLW0 &= ~(UCMSB + UCCKPL);
-	UCA0CTLW0 |= device;
+	spi_set_mode(device);
+	spi_set_device_divisor(device);
 
-	UCA0CTLW0 |= UCSSEL__SMCLK;                     // SMCLK
-	UCA0BR0 = 0x04; // /4 ? ANTES ERA 0x02 Bitch, cuz we want slow clock to be cool
-	UCA0BR1 = 0;                              //
-	UCA0CTL1 &= ~UCSWRST;                   // **Initialize USCI state machine**
-
+	UCA0CTLW0 &= ~UCSWRST; // **Initialize USCI state machine**
 }
 
 void sendByteWithAddressSPI(const unsigned char address, const unsigned char data) {
@@ -44,7 +39,6 @@ void sendByteWithAddressSPI(const unsigned char address, const unsigned char dat
 }
 
 void sendByteSPI(const unsigned char data) {
-
 	while (!(UCA0IFG & UCTXIFG)); // UCA0 tx buffer ready?
 	UCA0TXBUF = data;
 	while (!(UCA0IFG & UCTXIFG));
@@ -76,30 +70,32 @@ void readMultipleBytesSPI(const unsigned char address, const unsigned char n, un
 	__delay_cycles(25);
 }
 
-void spiSelect(const unsigned char device) {
+void spi_select(const unsigned char device) {
 	switch(device) {
 	case GYRO: //GYRO
-		P3OUT &= ~BIT0;
+		GYRO_SELECT();
 		break;
 	case SD:
-		P3OUT |= BIT2;
+		SD_SELECT();
+		break;
+	case RF:
+		RF_SELECT();
 		break;
 	default:
 		break;
 	}
-
 }
 
-void spiDeselect(const unsigned char device) {
+void spi_deselect(const unsigned char device) {
 	switch(device) {
 	case GYRO:
-		P3OUT |= BIT0;
+		GYRO_DESELECT();
 		break;
 	case SD:
-		P3OUT &= ~BIT2;
+		SD_DESELECT();
 		break;
-	case ALL:
-		P3OUT |= BIT0;
+	case RF:
+		RF_DESELECT();
 		break;
 	default:
 		break;
@@ -108,19 +104,14 @@ void spiDeselect(const unsigned char device) {
 }
 
 /**
- * For SD Card
+ * spi_send, spi_receive and spi_set_divisor are mostly for original SD Card code
+ * spi_send() - send byte
  */
-
 uint8_t spi_send(const uint8_t c)
 {
-	while (!(UCA0IFG & UCTXIFG))
-		; // wait for previous tx to complete
-
+	while (!(UCA0IFG & UCTXIFG)); // wait for previous tx to complete
 	UCA0TXBUF = c; // setting TXBUF clears the TXIFG flag
-
-	while (!(UCA0IFG & UCRXIFG))
-		; // wait for an rx character
-
+	while (!(UCA0IFG & UCRXIFG)); // wait for an rx character
 	return UCA0RXBUF; // reading clears RXIFG flag
 }
 
@@ -129,23 +120,52 @@ uint8_t spi_send(const uint8_t c)
  */
 uint8_t spi_receive(void) {
 
-	while (!(UCA0IFG & UCTXIFG))
-		; // wait for any previous xmits to complete
-
+	while (!(UCA0IFG & UCTXIFG)); // wait for any previous xmits to complete
 	UCA0TXBUF = 0xFF; // Send dummy packet to get data back.
-
-	while (!(UCA0IFG & UCRXIFG))
-		; // wait to recv a character
-
+	while (!(UCA0IFG & UCRXIFG)); // wait to recv a character
 	return UCA0RXBUF; // reading clears RXIFG flag
 }
 
-void spi_set_divisor(const unsigned int clkdiv)
-{
-	UCA0CTL1 |= UCSWRST;		// go into reset state
-	UCA0BRW = clkdiv;			// see spi.h for possible divisions
-	UCA0CTL1 &= ~UCSWRST;		// re-initialize state machine
+/**
+ * spi_set_divisor() - set SPI speed using divisor. Reset state machine (for SD speed upgrading)
+ */
+void spi_set_divisor(const unsigned int clkdiv) {
+	UCA0CTLW0 |= UCSWRST;
+	UCA0BRW = clkdiv;
+	UCA0CTLW0 &= ~UCSWRST;
 }
 
+void spi_set_device_divisor(const unsigned char device)
+{
+	switch (device) {
+	case GYRO:
+		UCA0BRW = GYRO_SPI_DIVISOR;
+		break;
+	case SD:
+		UCA0BRW = SD_SPI_DIVISOR;
+		break;
+	case RF:
+		UCA0BRW = RF_SPI_DIVISOR;
+		break;
+	default:
+		break;
+	}
+}
 
+void spi_set_mode(const unsigned char device) {
+	switch (device) {
+	case GYRO:
+		UCA0CTLW0 = GYRO_SPI_MODE;
+		break;
+	case SD:
+		UCA0CTLW0 = SD_SPI_MODE;
+		break;
+	case RF:
+		UCA0CTLW0 = RF_SPI_MODE;
+		break;
+	default:
+		break;
+	}
+	UCA0CTLW0 |= UCSSEL__SMCLK; // set SMCLK
+}
 

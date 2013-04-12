@@ -43,8 +43,4 @@ struct SYSTEM_FLAG {
 };
 extern volatile struct SYSTEM_FLAG system_flags;
 
-#undef DEBUG
-//#define DEBUG
-//#define DEBUG_SD_CARD
-
 #endif

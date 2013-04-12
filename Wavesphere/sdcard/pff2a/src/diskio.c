@@ -6,12 +6,12 @@
 #include <stdint.h>
 #include "diskio.h"
 #include "pff.h"
-#include "../../drivers/spi.h"
+#include "../../../common/spi/spi.h"
 
-#define DELAY_100US()	__delay_cycles(1600)	// ( 100us/(1/16Mhz) )  = 1600 ticks
-#define SELECT()	P3OUT &= ~BIT2				// CS = L
-#define DESELECT()	P3OUT |= BIT2				//CS = H
-#define MMC_SEL		!(P3OUT & BIT2)				//CS status (true:CS == L)
+#define DELAY_100US()	__delay_cycles(1200)				// ( 100us/(1/12Mhz) )  = 1200 ticks
+#define SELECT()	SD_SELECT()								// CS = L
+#define DESELECT()	SD_DESELECT()							//CS = H
+#define MMC_SEL		!(SD_CS_PORT & SD_CS_BIT)				//CS status (true:CS == L)
 
 // Definitions for MMC/SDC command
 #define CMD0	(0x40+0)	// GO_IDLE_STATE

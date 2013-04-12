@@ -8,7 +8,9 @@
 
 #include <msp430fr5969.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include "main.h"
+#include "common/spi/spi.h"
 
 /**
  * System Flags Structure
@@ -33,10 +35,13 @@ void setup_crystal() {
 	CSCTL0_H = 0xA5; 							// Write password to unlock clock registers
 	CSCTL1 = DCOFSEL0; 							// Set DCO to lowest speed (about 1MHz)
 	CSCTL2 = SELS__HFXTCLK + SELM__HFXTCLK; 	// set SMCLK and MCLK to HFXTCLK 12MHz crystal oscillator
-	CSCTL3 = DIVS__4; 							// set SMCLK divisor to 4, SMCLK = 3MHz
+	CSCTL3 = DIVS__1; 							// set SMCLK divisor to 1, SMCLK = 12MHz
 	CSCTL4 = HFFREQ_2;							// set HFX frequency to 8-16MHz
 	CSCTL5 |= ENSTFCNT2;						// enable HF counter
 	CSCTL0_H = 0; 								// reset password to lock clock registers
+
+	P3SEL1 |= BIT4;
+	P3DIR |= BIT4; // output SMCLK on P3.4
 
 	do {
 		CSCTL5 &= ~HFXTOFFG;   					// Clear XT1 fault flag
@@ -66,7 +71,6 @@ void shutdown_components(void) {
 	return;
 }
 
-#ifndef DEBUG
 int main(void) {
 	WDTCTL = WDTPW | WDTHOLD;		// Stop watchdog timer
 
@@ -166,4 +170,3 @@ __interrupt void XBee_ISR(void)
 	_nop(); // THIS NOP MUST BE HERE!!!
 }
 
-#endif
