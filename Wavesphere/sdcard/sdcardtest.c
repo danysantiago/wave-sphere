@@ -2,9 +2,9 @@
  * sdcardtest.c - For testing SD card functions.
  * Author: Samuel
  */
-#include "../main.h"
 
 #ifdef DEBUG_SD_CARD
+#include "../main.h"
 #include <msp430fr5969.h>
 #include <stdint.h>
 #include <stdarg.h>
