@@ -129,18 +129,19 @@ public class SerialCommunication implements SerialPortEventListener {
 				for(int i = 0; i < this.getInputStream().available(); i++){
 					char c = (char)this.getInputStream().read();
 					//System.out.print(c);
+
 					serialWindow.printToTextArea(c);
 				}
 			}
-			}catch(Exception e){
-				System.out.println("Error getting data");
-			}
+		}catch(Exception e){
+			System.out.println("Error getting data");
+		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public ArrayList<String> getSerialPorts(){
 		ArrayList<String> serialPorts = new ArrayList<String>();
-		
+
 		Enumeration<CommPortIdentifier> portList = CommPortIdentifier.getPortIdentifiers();
 
 		CommPortIdentifier portId = null;
@@ -156,16 +157,16 @@ public class SerialCommunication implements SerialPortEventListener {
 
 			}
 		}
-		
+
 		return serialPorts;
 	}
-	
+
 	public void write(String data){
 		outputStream.print(data);
 		//outputStream.print("\r\n");
 		outputStream.flush();
 	}
-	
+
 	public void write(int data){
 		outputStream.write(data);
 		outputStream.flush();
