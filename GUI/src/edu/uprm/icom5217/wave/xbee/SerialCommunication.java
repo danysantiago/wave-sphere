@@ -18,6 +18,8 @@ import java.util.TooManyListenersException;
 
 public class SerialCommunication implements SerialPortEventListener {
 
+	public int flag;
+	
 	private  InputStream inputStream;
 	private  PrintStream outputStream;
 
@@ -26,6 +28,18 @@ public class SerialCommunication implements SerialPortEventListener {
 	public SerialCommunication(){
 
 	}	
+
+	public int getFlag() {
+		return flag;
+	}
+
+
+
+	public void setFlag(int flag) {
+		this.flag = flag;
+	}
+
+
 
 	public  void openSerialPort(String port, int baudRate) throws PortInUseException, UnsupportedCommOperationException, TooManyListenersException, IOException {
 		openSerialPort(port, "XBee", 0, baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE, SerialPort.FLOWCONTROL_NONE);
@@ -131,6 +145,30 @@ public class SerialCommunication implements SerialPortEventListener {
 					char c = (char)this.getInputStream().read();
 					System.out.print(c);
 					//serialWindow.printToTextArea(c);
+					
+					switch(flag){
+					case XBee.lang.ID:
+						//print to id area
+						break;
+					case XBee.lang.RETRIEVAL_MODE:
+						//store in temp file
+						break;
+					case XBee.lang.SHUTDOWN_MODE:
+						//nothing?
+						break;
+					case XBee.lang.SAMPLING_MODE:
+						//print to locate area
+						break;
+					case XBee.lang.STATUS_MODE:
+						//print to status area
+						break;
+					case XBee.lang.DIAGNOSTIC_MODE:
+						//print to diagnostic window
+						break;
+					default:
+						System.out.println(c);
+						break;
+					}
 				}
 			}
 			}catch(Exception e){

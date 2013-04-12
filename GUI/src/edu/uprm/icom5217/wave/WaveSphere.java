@@ -16,7 +16,7 @@ import gnu.io.UnsupportedCommOperationException;
 
 public class WaveSphere{
 	public static SerialCommunication serial;
-
+	
 	private static  MainWindow window;
 	/**
 	 * @param args

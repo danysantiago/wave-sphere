@@ -37,6 +37,7 @@ public class RightPanel extends JPanel {
 			exitButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					WaveSphere.serial.write(XBee.lang.STATUS_MODE);
+					WaveSphere.serial.setFlag(XBee.lang.STATUS_MODE);
 					MainWindow.normalMode();
 				}
 			});

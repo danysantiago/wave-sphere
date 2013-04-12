@@ -52,6 +52,7 @@ public class RightPanel2 extends JPanel {
 			retrievalModeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					WaveSphere.serial.write(XBee.lang.RETRIEVAL_MODE);
+					WaveSphere.serial.setFlag(XBee.lang.RETRIEVAL_MODE);
 					MainWindow.retrievalMode();
 				}
 			});
@@ -65,6 +66,7 @@ public class RightPanel2 extends JPanel {
 			diagnosticButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					WaveSphere.serial.write(XBee.lang.DIAGNOSTIC_MODE);
+					WaveSphere.serial.setFlag(XBee.lang.DIAGNOSTIC_MODE);
 					DiagnosticWindow.display("");
 				}
 			});
@@ -75,6 +77,7 @@ public class RightPanel2 extends JPanel {
 	private JLabel getBolaIdLabel() {
 		if (bolaIdLabel == null) {
 			WaveSphere.serial.write(XBee.lang.ID);
+			WaveSphere.serial.setFlag(XBee.lang.ID);
 			//TODO do something to wait for id
 			bolaIdLabel = new JLabel("827345980236");
 			bolaIdLabel.setName("bolaIdLabel");
@@ -87,6 +90,7 @@ public class RightPanel2 extends JPanel {
 			samplingModeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					WaveSphere.serial.write(XBee.lang.SAMPLING_MODE);
+					WaveSphere.serial.setFlag(XBee.lang.SAMPLING_MODE);
 					Calendar c = Calendar.getInstance();
 					WaveSphere.serial.write(Long.toString(c.getTimeInMillis()));
 					MainWindow.samplingMode();
@@ -131,6 +135,7 @@ public class RightPanel2 extends JPanel {
 				public void actionPerformed(ActionEvent e) {
 					if(getTurnOffButton().getText().contains("Off")){
 						WaveSphere.serial.write(XBee.lang.SHUTDOWN_MODE);
+						WaveSphere.serial.setFlag(XBee.lang.SHUTDOWN_MODE);
 						getTurnOffButton().setText("Turn On");
 					}
 					else{

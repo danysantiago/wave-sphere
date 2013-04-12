@@ -58,6 +58,7 @@ public class LocationModeWindow extends JDialog{
 			newButtonButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					WaveSphere.serial.write(XBee.lang.STOP_LOCATE_MODE);
+					WaveSphere.serial.setFlag(XBee.lang.STOP_LOCATE_MODE);
 					dispose();
 				}
 			});
