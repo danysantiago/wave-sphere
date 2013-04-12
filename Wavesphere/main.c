@@ -22,9 +22,45 @@ volatile struct SYSTEM_FLAG system_flags = {
 };
 
 /**
- * Initially sets up system
+ * Sets up clock system
  */
-void setup_clocks() {
+void setup_crystal() {
+	// Set PJ for HF Crystal use
+	PJSEL0 |= BIT6;
+	PJSEL1 &= ~BIT6;
+
+	// Configure CS module
+	CSCTL0_H = 0xA5; 							// Write password to unlock clock registers
+	CSCTL1 = DCOFSEL0; 							// Set DCO to lowest speed (about 1MHz)
+	CSCTL2 = SELS__HFXTCLK + SELM__HFXTCLK; 	// set SMCLK and MCLK to HFXTCLK 12MHz crystal oscillator
+	CSCTL3 = DIVS__4; 							// set SMCLK divisor to 4, SMCLK = 3MHz
+	CSCTL4 = HFFREQ_2;							// set HFX frequency to 8-16MHz
+	CSCTL5 |= ENSTFCNT2;						// enable HF counter
+	CSCTL0_H = 0; 								// reset password to lock clock registers
+
+	do {
+		CSCTL5 &= ~HFXTOFFG;   					// Clear XT1 fault flag
+		SFRIFG1 &= ~OFIFG;
+	} while (SFRIFG1&OFIFG);					// Test oscillator fault flag
+
+	SFRIE1 |= OFIE; // enable oscillator fault interrupt. If there is a fault.... then what?
+	return;
+}
+
+void setup_rfwakeup(void) {
+	P4IE |= BIT5; // enable interrupts on P4.5
+	return;
+}
+
+void default_clock_system(void) {
+	// disable XF crystal
+	// put DCO in 1MHz, etc.
+	_nop();
+	return;
+}
+
+void shutdown_components(void) {
+	// shutdown xbee, sensors, etc.
 	_nop();
 	return;
 }
@@ -33,17 +69,12 @@ void setup_clocks() {
 int main(void) {
 	WDTCTL = WDTPW | WDTHOLD;		// Stop watchdog timer
 
-	// prepare clocks with 12MHz crystal
-	setup_clocks();
-	_enable_interrupts(); // enable global interrupts
-
 	for(;;) {
-		// shutdown system
-		// clear all flags (in case)
-		// enter low power mode
-
-		// when low power mode is exited
+		setup_rfwakeup();
+		// at this point, the system is shut down with RF wakeup interrupts enabled.
+		__bis_SR_register(LPM4_bits+GIE); // rf wakeup will take it out of this very low power mode
 		for(;;) {
+			__bis_SR_register(LPM0_bits+GIE);	// LPM0. XBee interrupt will take it out of this low power mode. XT on.
 			if (system_flags.shutdown_flag) {
 				break;
 			}
@@ -63,7 +94,30 @@ int main(void) {
 				status_service(); // will send status info through the xbee once.
 			}
 		}
+
+		// shutdown system
+		default_clock_system();
+		shutdown_components();
+
+		// clear all flags
+		system_flags.diagnostic_flag = false;
+		system_flags.retrieval_flag = false;
+		system_flags.sampling_flag = false;
+		system_flags.shutdown_flag = false;
 	}
+}
+
+#pragma vector=PORT4_VECTOR
+__interrupt void RF_Wakeup_ISR(void) {
+	// RF wakeup is in port 4.5 and it is the only pin that could cause interrupts
+	setup_crystal(); // turn on 12MHz crystal and switch clocks to use it
+
+	// turn off interrupt flag...
+	P4IFG &= ~BIT5;
+
+	// wake up CPU on exit
+	__bic_SR_register_on_exit(LPM4_bits);
+	_nop(); // YOU MUST HAVE NOP HERE
 }
 
 #pragma vector=USCI_A1_VECTOR
@@ -96,7 +150,6 @@ __interrupt void XBee_ISR(void)
 			system_flags.shutdown_flag = true;
 			break;
 		default:
-			// break power mode
 			break;
 
 		}
@@ -106,6 +159,9 @@ __interrupt void XBee_ISR(void)
 		case USCI_UART_UCSTTIFG: break;
 		case USCI_UART_UCTXCPTIFG: break;
 	}
+
+	__bic_SR_register_on_exit(LPM0_bits); // wakeup cpu on exit
+	_nop(); // THIS NOP MUST BE HERE!!!
 }
 
 #endif
