@@ -49,6 +49,7 @@ void setup_crystal() {
 
 void setup_rfwakeup(void) {
 	P4IE |= BIT5; // enable interrupts on P4.5
+	//TODO ENVIAR COMANDOS DE SPI
 	return;
 }
 
@@ -115,6 +116,7 @@ __interrupt void RF_Wakeup_ISR(void) {
 	// turn off interrupt flag...
 	P4IFG &= ~BIT5;
 
+	//TODO CLEAR WAKE, SEND SPI COMMANDS TO DO THIS
 	// wake up CPU on exit
 	__bic_SR_register_on_exit(LPM4_bits);
 	_nop(); // YOU MUST HAVE NOP HERE
