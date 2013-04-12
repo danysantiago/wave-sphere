@@ -16,9 +16,9 @@ void spiInit(const unsigned char device) {
 	P3DIR |= BIT0 + BIT1 + BIT2; // all chip selects as outputs
 
 	// all chips deselected
-	spi_deselect(GYRO);
-	spi_deselect(RF);
-	spi_deselect(SD);
+	spi_deselect(GYRO_DEVICE);
+	spi_deselect(RF_DEVICE);
+	spi_deselect(SD_DEVICE);
 
 	UCA0CTLW0 |= UCSWRST; // put state machine in reset
 
@@ -72,13 +72,13 @@ void readMultipleBytesSPI(const unsigned char address, const unsigned char n, un
 
 void spi_select(const unsigned char device) {
 	switch(device) {
-	case GYRO: //GYRO
+	case GYRO_DEVICE: //GYRO
 		GYRO_SELECT();
 		break;
-	case SD:
+	case SD_DEVICE:
 		SD_SELECT();
 		break;
-	case RF:
+	case RF_DEVICE:
 		RF_SELECT();
 		break;
 	default:
@@ -88,13 +88,13 @@ void spi_select(const unsigned char device) {
 
 void spi_deselect(const unsigned char device) {
 	switch(device) {
-	case GYRO:
+	case GYRO_DEVICE:
 		GYRO_DESELECT();
 		break;
-	case SD:
+	case SD_DEVICE:
 		SD_DESELECT();
 		break;
-	case RF:
+	case RF_DEVICE:
 		RF_DESELECT();
 		break;
 	default:
@@ -138,13 +138,13 @@ void spi_set_divisor(const unsigned int clkdiv) {
 void spi_set_device_divisor(const unsigned char device)
 {
 	switch (device) {
-	case GYRO:
+	case GYRO_DEVICE:
 		UCA0BRW = GYRO_SPI_DIVISOR;
 		break;
-	case SD:
+	case SD_DEVICE:
 		UCA0BRW = SD_SPI_DIVISOR;
 		break;
-	case RF:
+	case RF_DEVICE:
 		UCA0BRW = RF_SPI_DIVISOR;
 		break;
 	default:
@@ -154,13 +154,13 @@ void spi_set_device_divisor(const unsigned char device)
 
 void spi_set_mode(const unsigned char device) {
 	switch (device) {
-	case GYRO:
+	case GYRO_DEVICE:
 		UCA0CTLW0 = GYRO_SPI_MODE;
 		break;
-	case SD:
+	case SD_DEVICE:
 		UCA0CTLW0 = SD_SPI_MODE;
 		break;
-	case RF:
+	case RF_DEVICE:
 		UCA0CTLW0 = RF_SPI_MODE;
 		break;
 	default:

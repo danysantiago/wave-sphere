@@ -9,9 +9,9 @@
 #define SPI_H_
 #include <stdint.h>
 // device identifier
-#define GYRO 0
-#define SD 1
-#define RF 2
+#define GYRO_DEVICE 0
+#define SD_DEVICE 1
+#define RF_DEVICE 2
 
 // device spi polarity mode
 #define GYRO_SPI_MODE UCMST + UCSYNC + UCCKPL + UCMSB // UCCKPL = 1 means inactive state is high, UCCKPH = 0 means data is changed on first edge
@@ -51,9 +51,11 @@
 #define SPI_6MHz	2
 #define SPI_12MHz	1 // 12MHz / 12MHz
 
+#define RF_SPI_1MHz 1 // DCO at 1MHz/1MHz (this is the special component that will run with SMCLK at 1MHz)
+
 #define GYRO_SPI_DIVISOR SPI_1MHz
 #define SD_SPI_DIVISOR SPI_250kHz
-#define RF_SPI_DIVISOR SPI_1MHz
+#define RF_SPI_DIVISOR RF_SPI_1MHz
 #define SPI_DEF_SPEED SPI_4MHz // for sd card after initialization
 
 // function declarations

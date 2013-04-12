@@ -34,9 +34,10 @@ void setup_crystal() {
 	// Configure CS module
 	CSCTL0_H = 0xA5; 							// Write password to unlock clock registers
 	CSCTL1 = DCOFSEL0; 							// Set DCO to lowest speed (about 1MHz)
+	CSCTL1 &= ~DCORSEL;
 	CSCTL2 = SELS__HFXTCLK + SELM__HFXTCLK; 	// set SMCLK and MCLK to HFXTCLK 12MHz crystal oscillator
 	CSCTL3 = DIVS__1; 							// set SMCLK divisor to 1, SMCLK = 12MHz
-	CSCTL4 = HFFREQ_2;							// set HFX frequency to 8-16MHz
+	CSCTL4 = HFFREQ_2;							// set HFX frequency to 8-16MHz, HFXTOFF = 0, turn it on
 	CSCTL5 |= ENSTFCNT2;						// enable HF counter
 	CSCTL0_H = 0; 								// reset password to lock clock registers
 
@@ -54,14 +55,25 @@ void setup_crystal() {
 
 void setup_rfwakeup(void) {
 	P4IE |= BIT5; // enable interrupts on P4.5
+	spiInit(RF_DEVICE);
+
 	//TODO ENVIAR COMANDOS DE SPI
+
 	return;
 }
 
 void default_clock_system(void) {
 	// disable XF crystal
 	// put DCO in 1MHz, etc.
-	_nop();
+	CSCTL0_H = 0xA5;						// Password
+	CSCTL1 = DCOFSEL_0;						// Set DCO = 1MHz
+	CSCTL1 &= ~DCORSEL;
+	CSCTL2 = SELS__DCOCLK + SELM__DCOCLK;
+	CSCTL3 = DIVS__1 + DIVM__1;				// set dividers
+	CSCTL4 |= HFXTOFF;						// make sure crystal is off
+	CSCTL5 &= ~ENSTFCNT2;					// disable HF counter
+	CSCTL0_H = 0; 								// reset password to lock clock registers
+
 	return;
 }
 
@@ -73,6 +85,7 @@ void shutdown_components(void) {
 
 int main(void) {
 	WDTCTL = WDTPW | WDTHOLD;		// Stop watchdog timer
+	default_clock_system();
 
 	for(;;) {
 		setup_rfwakeup();
@@ -121,6 +134,7 @@ __interrupt void RF_Wakeup_ISR(void) {
 	P4IFG &= ~BIT5;
 
 	//TODO CLEAR WAKE, SEND SPI COMMANDS TO DO THIS
+
 	// wake up CPU on exit
 	__bic_SR_register_on_exit(LPM4_bits);
 	_nop(); // YOU MUST HAVE NOP HERE
