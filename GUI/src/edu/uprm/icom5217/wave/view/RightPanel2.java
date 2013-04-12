@@ -1,14 +1,16 @@
 package edu.uprm.icom5217.wave.view;
 
-import javax.swing.JPanel;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-
-import edu.uprm.icom5217.wave.view.diagnostic.DiagnosticWindow;
-
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import net.miginfocom.swing.MigLayout;
+import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.view.diagnostic.DiagnosticWindow;
+import edu.uprm.icom5217.wave.xbee.XBee;
 
 public class RightPanel2 extends JPanel {
 	private JLabel idLabel;
@@ -48,6 +50,7 @@ public class RightPanel2 extends JPanel {
 			retrievalModeButton = new JButton("Retrieval Mode");
 			retrievalModeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
+					WaveSphere.serial.write(XBee.lang.RETRIEVAL_MODE);
 					MainWindow.retrievalMode();
 				}
 			});
@@ -60,7 +63,8 @@ public class RightPanel2 extends JPanel {
 			diagnosticButton = new JButton("Diagnostic Mode");
 			diagnosticButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-				   DiagnosticWindow.display("");
+					WaveSphere.serial.write(XBee.lang.DIAGNOSTIC_MODE);
+					DiagnosticWindow.display("");
 				}
 			});
 			diagnosticButton.setName("diagnosticButton");
@@ -69,6 +73,8 @@ public class RightPanel2 extends JPanel {
 	}
 	private JLabel getBolaIdLabel() {
 		if (bolaIdLabel == null) {
+			WaveSphere.serial.write(XBee.lang.ID);
+			//TODO do something to wait for id
 			bolaIdLabel = new JLabel("827345980236");
 			bolaIdLabel.setName("bolaIdLabel");
 		}
@@ -79,7 +85,8 @@ public class RightPanel2 extends JPanel {
 			samplingModeButton = new JButton("Sampling Mode");
 			samplingModeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-				 MainWindow.samplingMode();
+					WaveSphere.serial.write(XBee.lang.SAMPLING_MODE);
+					MainWindow.samplingMode();
 				}
 			});
 			samplingModeButton.setName("samplingModeButton");
@@ -120,12 +127,14 @@ public class RightPanel2 extends JPanel {
 			turnOffButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					if(getTurnOffButton().getText().contains("Off")){
+						WaveSphere.serial.write(XBee.lang.SHUTDOWN_MODE);
 						getTurnOffButton().setText("Turn On");
 					}
 					else{
+						//TODO send RF signal
 						getTurnOffButton().setText("Turn Off");
 					}
-				
+
 				}
 			});
 			turnOffButton.setName("turnOffButton");

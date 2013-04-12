@@ -1,21 +1,15 @@
 package edu.uprm.icom5217.wave.view;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import edu.uprm.icom5217.wave.view.diagnostic.DiagnosticWindow;
-
 import net.miginfocom.swing.MigLayout;
-import java.awt.Component;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class RightPanel extends JPanel {
 	private JPanel sphereInfoPanel;

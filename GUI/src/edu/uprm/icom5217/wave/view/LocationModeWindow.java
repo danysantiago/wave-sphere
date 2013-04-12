@@ -1,13 +1,16 @@
 package edu.uprm.icom5217.wave.view;
 
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
-import javax.swing.JButton;
-import java.awt.Toolkit;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.xbee.XBee;
 
 public class LocationModeWindow extends JDialog{
 	private JLabel theCurentLocationLabel;
@@ -54,6 +57,7 @@ public class LocationModeWindow extends JDialog{
 			newButtonButton = new JButton("Exit");
 			newButtonButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					WaveSphere.serial.write(XBee.lang.STOP_LOCATE_MODE);
 					dispose();
 				}
 			});
