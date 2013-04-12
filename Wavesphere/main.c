@@ -3,7 +3,6 @@
  * Author: Samuel
  *
  * This is the main entry point of the Wavesphere embedded application.
- * Initial version contains blinking LED example.
  * See System Flowchart.
  */
 
@@ -67,8 +66,6 @@ int main(void) {
 	}
 }
 
-#endif
-
 #pragma vector=USCI_A1_VECTOR
 __interrupt void XBee_ISR(void)
 {
@@ -110,3 +107,5 @@ __interrupt void XBee_ISR(void)
 		case USCI_UART_UCTXCPTIFG: break;
 	}
 }
+
+#endif
