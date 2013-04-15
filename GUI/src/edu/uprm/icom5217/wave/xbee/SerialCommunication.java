@@ -73,7 +73,8 @@ public class SerialCommunication implements SerialPortEventListener {
 
 		if (!found) {
 			System.out.println("Could not find port: " + port);
-			System.exit(1);
+			throw new NullPointerException();
+			//System.exit(1);
 		}
 
 
@@ -200,14 +201,14 @@ public class SerialCommunication implements SerialPortEventListener {
 	}
 	
 	public void write(String data){
-		outputStream.print(data);
-		//outputStream.print("\r\n");
-		outputStream.flush();
+		//outputStream.print(data);
+		//outputStream.print("\r\n"); //needed for AT commands
+		//outputStream.flush();
 	}
 	
 	public void write(int data){
-		outputStream.write(data);
-		outputStream.flush();
+		//outputStream.write(data);
+		//outputStream.flush();
 
 	}
 

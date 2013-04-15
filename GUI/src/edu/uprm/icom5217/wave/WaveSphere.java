@@ -28,7 +28,7 @@ public class WaveSphere{
 	public static void main(String[] args) throws PortInUseException, UnsupportedCommOperationException, TooManyListenersException, IOException {
 		
 		serial = new SerialCommunication();
-		serial.openSerialPort("COM10", 9600); // TODO change to dropdown list
+		//serial.openSerialPort("COM10", 9600); // TODO change to dropdown list
 		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());//might make it look better on Mac

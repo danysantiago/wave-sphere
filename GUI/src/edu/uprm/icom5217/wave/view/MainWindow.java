@@ -72,6 +72,11 @@ public class MainWindow extends JFrame{
 		getInstance().repaint();
 	}
 	 
+	public static void connectMode(){
+		getInstance().getSplitPane().setRightComponent(new ConnectionPane());
+		getInstance().revalidate();
+		getInstance().repaint();
+	}
 	public static void samplingMode(){
 		getInstance().getSplitPane().setRightComponent(new SamplingWaitScreen());
 	}
