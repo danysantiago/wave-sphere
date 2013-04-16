@@ -39,7 +39,7 @@ void setup_crystal() {
 	CSCTL3 = DIVS__1; 							// set SMCLK divisor to 1, SMCLK = 12MHz
 	CSCTL4 = HFFREQ_2;							// set HFX frequency to 8-16MHz, HFXTOFF = 0, turn it on
 	CSCTL5 |= ENSTFCNT2;						// enable HF counter
-	CSCTL0_H = 0; 								// reset password to lock clock registers
+	//CSCTL0_H = 0; 								// reset password to lock clock registers
 
 	P3SEL1 |= BIT4;
 	P3DIR |= BIT4; // output SMCLK on P3.4
@@ -54,10 +54,19 @@ void setup_crystal() {
 }
 
 void setup_rfwakeup(void) {
+	volatile unsigned char data;
+	data = 0;
 	P4IE |= BIT5; // enable interrupts on P4.5
 	spiInit(RF_DEVICE);
 
 	//TODO ENVIAR COMANDOS DE SPI
+	spi_select(RF_DEVICE);
+	data = readByteSPI(0x41);
+	__delay_cycles(50);
+	spi_deselect(RF_DEVICE);
+
+	// read the data here
+	_nop();
 
 	return;
 }
@@ -72,7 +81,7 @@ void default_clock_system(void) {
 	CSCTL3 = DIVS__1 + DIVM__1;				// set dividers
 	CSCTL4 |= HFXTOFF;						// make sure crystal is off
 	CSCTL5 &= ~ENSTFCNT2;					// disable HF counter
-	CSCTL0_H = 0; 								// reset password to lock clock registers
+//	CSCTL0_H = 0; 								// reset password to lock clock registers
 
 	return;
 }

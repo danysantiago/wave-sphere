@@ -13,6 +13,7 @@ void spiInit(const unsigned char device) {
 	// Configure ports for SPI
 	P2SEL1 |= BIT0 + BIT1; // data
 	P1SEL1 |= BIT5; // clk
+	P3OUT &= ~(BIT0 + BIT1 + BIT2); // all chip selects LOW, does not mean it will be deselected (some act h, some l)
 	P3DIR |= BIT0 + BIT1 + BIT2; // all chip selects as outputs
 
 	// all chips deselected
