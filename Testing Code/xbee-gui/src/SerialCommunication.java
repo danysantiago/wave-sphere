@@ -21,6 +21,9 @@ public class SerialCommunication implements SerialPortEventListener {
 	private  PrintStream outputStream;
 
 	private  SerialPort serialPort;
+	private int index = 0;
+	private StringBuilder sb = new StringBuilder();
+	private boolean flag = false;
 
 	public SerialCommunication(){
 
@@ -130,7 +133,26 @@ public class SerialCommunication implements SerialPortEventListener {
 					char c = (char)this.getInputStream().read();
 					//System.out.print(c);
 
-					serialWindow.printToTextArea(c);
+					//serialWindow.printToTextArea(c);
+
+					if(c=='\n'){
+						index++;
+						if(index%4 == 3)
+							sb = new StringBuilder();
+						if(index%4 == 0){
+							sb.append(c);
+							serialWindow.printToTextArea(sb.toString());
+						}
+					}
+
+					if(index%4 == 3){
+//						if(c==',')
+//							c = ' ';
+
+						sb.append(c);
+					}
+
+					//if(sb.toString().matches(regex))
 				}
 			}
 		}catch(Exception e){

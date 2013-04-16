@@ -169,4 +169,9 @@ public class serialWindow {
 	public static void printToTextArea(char c){
 		textArea.append(""+c);
 	}
+
+	public static void printToTextArea(String s) {
+		// TODO Auto-generated method stub
+		textArea.append(s);
+	}
 }
