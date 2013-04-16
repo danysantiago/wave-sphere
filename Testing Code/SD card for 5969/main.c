@@ -15,12 +15,41 @@
  * Seup - initialize timers and clocks
  */
 void setup() {
-	WDTCTL = WDTPW + WDTHOLD;       // Stop the watchdog timer.
+	WDTCTL = WDTPW | WDTHOLD;                 // Stop Watchdog
 
-	CSCTL0_H = 0xA5; 				// Set password to write clock registers.
-	CSCTL1 = DCOFSEL_4 | DCORSEL; 	// Set DCOCLK to 16MHz
-	CSCTL2 = SELM__DCOCLK + SELS__DCOCLK; // Set MCLK and SMCLK to DCO
-	CSCTL0_H = 0; 					// Lock clock registers
+	// Startup clock system with max DCO setting ~8MHz
+	CSCTL0 = CSKEY;                           // Unlock clock registers
+	CSCTL1 = DCOFSEL_3 | DCORSEL;             // DCO - 8Mhz
+	CSCTL2 = SELA__VLOCLK + SELS__DCOCLK + SELM__DCOCLK;
+	CSCTL3 = DIVA__1 + DIVS__1 + DIVM__1;     // set all dividers
+	// Setup LED Pin
+	P1OUT |= BIT3;
+	P1DIR |= BIT3;
+
+	// Configure UART pins
+	P2REN &= ~(BIT5 + BIT6);
+	P2SEL1 |= BIT5 + BIT6;
+	P2SEL0 &= ~(BIT5 + BIT6);
+	P2DIR |= BIT6; // TX as output
+
+	// Configure UART
+	UCA1CTL1 |= UCSWRST;                      // Put eUSCI in reset
+	UCA1CTL1 |= UCSSEL__SMCLK;                // CLK = SMCLK
+
+	// Baud Rate calculation
+	// 8000000/(16*9600) = 52.083
+	// Fractional portion = 0.083
+	// User's Guide Table 21-4: UCBRSx = 0x04
+	// UCBRFx = int ( (52.083-52)*16) = 1
+	UCA1BR0 = 52;                             // 8000000/16/9600
+	UCA1BR1 = 0x00;
+	UCA1MCTLW |= UCOS16 | UCBRF_1;
+
+	UCA1CTL1 &= ~UCSWRST;                     // Initialize eUSCI
+	UCA1IE |= UCRXIE;                         // Enable USCI_A1 RX interrupt
+
+	_enable_interrupts();
+	_nop();                         // For debugger
 
 	P3DIR |= BIT4;	// CS initially disabled (it is active low)
 	P3SEL1 |= BIT4; // output SMCLK for measurement on P3.4
@@ -32,6 +61,8 @@ void main (void)
 {
 	FRESULT res;
 	FATFS fs; // File system object
+	WORD s1; // unsigned short
+	unsigned char i;
 
 	setup();
 	spi_initialize();
@@ -67,6 +98,21 @@ void main (void)
 			}
 		}
 	}
+
+
+	pf_lseek(0); // seek to start of file
+
+	res = pf_read(line, sizeof(line), &s1); // fill up buffer and then dump it through uart
+	if (res != FR_OK) {
+		// ERROR
+	}
+
+	for (i = 0; s1 > 0; s1--, i++) {
+		// send line[i] through uart
+		while (!(UCA1IFG&UCTXIFG));                // USCI_A0 TX buffer ready?
+		UCA1TXBUF = line[i];
+	}
+
 
 	while(1);
 }
