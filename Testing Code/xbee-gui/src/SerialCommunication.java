@@ -136,21 +136,17 @@ public class SerialCommunication implements SerialPortEventListener {
 					//serialWindow.printToTextArea(c);
 
 					if(c=='\n'){
-						index++;
-						if(index%4 == 3)
-							sb = new StringBuilder();
-						if(index%4 == 0){
-							sb.append(c);
+						sb.append(c);
+						String s = sb.toString();
+						if(s.contains("$GPRMC")){
+							String[] st = s.split(",");
 							serialWindow.printToTextArea(sb.toString());
 						}
+						sb = new StringBuilder();
 					}
 
-					if(index%4 == 3){
-//						if(c==',')
-//							c = ' ';
-
+					else
 						sb.append(c);
-					}
 
 					//if(sb.toString().matches(regex))
 				}
