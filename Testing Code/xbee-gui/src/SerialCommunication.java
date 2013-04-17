@@ -139,8 +139,15 @@ public class SerialCommunication implements SerialPortEventListener {
 						sb.append(c);
 						String s = sb.toString();
 						if(s.contains("$GPRMC")){
+							//if(!s.contains("V")){
 							String[] st = s.split(",");
-							serialWindow.printToTextArea(sb.toString());
+							s = (st[3].length()>0? (st[3].substring(0, 2) + "\u00B0 " 
+									+ st[3].substring(2) + "' ") : "xx\u00B0 mm.dddd' ") + st[4] + ", "
+									+ (st[5].length()>0? (st[5].substring(0,3) + "\u00B0 " 
+											+ st[5].substring(3) + "' ") : "yyy\u00B0 mm.ddd' ") + st[6] + "\n";
+							if(s.length()==1)
+								s = sb.toString();
+							serialWindow.printToTextArea(s);
 						}
 						sb = new StringBuilder();
 					}
