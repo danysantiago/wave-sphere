@@ -20,8 +20,8 @@ int main(void) {
 	CSCTL3 = DIVA__1 + DIVS__1 + DIVM__1;     // set all dividers
 
 	// Setup LED Pin
-	P1OUT |= BIT3;
-	P1DIR |= BIT3;
+	P2OUT |= BIT7;
+	P2DIR |= BIT7;
 
 	// Configure UART pins
 	P2REN &= ~(BIT5 + BIT6);
@@ -68,7 +68,7 @@ __interrupt void USCI_A1_ISR(void)
     case USCI_NONE: break;
     case USCI_UART_UCRXIFG:
       c = UCA1RXBUF;
-      P1OUT = (c << 3);
+      P2OUT = (c << 7);
       __no_operation();
       break;
     case USCI_UART_UCTXIFG: break;
