@@ -59,10 +59,24 @@ void setup_rfwakeup(void) {
 	P4IE |= BIT5; // enable interrupts on P4.5
 	spiInit(RF_DEVICE);
 
-	//TODO ENVIAR COMANDOS DE SPI
+	// R0
 	spi_select(RF_DEVICE);
-	data = readByteSPI(0x41);
-	__delay_cycles(50);
+	sendByteWithAddressSPI(0x00, 0x0E);
+	spi_deselect(RF_DEVICE);
+
+	// R1
+	spi_select(RF_DEVICE);
+	sendByteWithAddressSPI(0x01, 0x30); // enable antenna damper
+	spi_deselect(RF_DEVICE);
+
+	// R4
+	spi_select(RF_DEVICE);
+	sendByteWithAddressSPI(0x04, 0x3F); // max damp resistance and max gain reduction ? (seems to not do anything)
+	spi_deselect(RF_DEVICE);
+
+	// R7
+	spi_select(RF_DEVICE);
+	sendByteWithAddressSPI(0x07, 0xEB); // 350msec in R7 timeout
 	spi_deselect(RF_DEVICE);
 
 	// read the data here
@@ -81,7 +95,7 @@ void default_clock_system(void) {
 	CSCTL3 = DIVS__1 + DIVM__1;				// set dividers
 	CSCTL4 |= HFXTOFF;						// make sure crystal is off
 	CSCTL5 &= ~ENSTFCNT2;					// disable HF counter
-//	CSCTL0_H = 0; 								// reset password to lock clock registers
+	CSCTL0_H = 0; 								// reset password to lock clock registers
 
 	return;
 }
@@ -134,9 +148,17 @@ int main(void) {
 	}
 }
 
+void turn_on_led_of_happiness(void) {
+	P2DIR |= BIT7;
+	P2OUT |= BIT7;
+	_nop();
+}
+
 #pragma vector=PORT4_VECTOR
 __interrupt void RF_Wakeup_ISR(void) {
 	// RF wakeup is in port 4.5 and it is the only pin that could cause interrupts
+	turn_on_led_of_happiness();
+	_nop();
 	setup_crystal(); // turn on 12MHz crystal and switch clocks to use it
 
 	// turn off interrupt flag...
