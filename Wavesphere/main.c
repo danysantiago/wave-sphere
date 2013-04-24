@@ -159,6 +159,7 @@ __interrupt void RF_Wakeup_ISR(void) {
 	// RF wakeup is in port 4.5 and it is the only pin that could cause interrupts
 	turn_on_led_of_happiness();
 	_nop();
+	while(1);
 	setup_crystal(); // turn on 12MHz crystal and switch clocks to use it
 
 	// turn off interrupt flag...
