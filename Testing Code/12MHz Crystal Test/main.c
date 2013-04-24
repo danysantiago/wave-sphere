@@ -4,8 +4,8 @@ int main(void) {
 	WDTCTL = WDTPW | WDTHOLD;		// Stop watchdog timer
 
 	// LED setup
-	P1OUT = 0;
-	P1DIR |= BIT0;
+//	P1OUT = 0;
+//	P1DIR |= BIT0;
 
 	// output SMCLK on P3.4
 	P3SEL1 |= BIT4;
@@ -19,9 +19,9 @@ int main(void) {
 	CSCTL0_H = 0xA5; 							// Write password to unlock clock registers
 	CSCTL1 = DCOFSEL_0; 						// Set DCO to 1MHz
 	CSCTL1 &= ~DCORSEL;
-	CSCTL2 = SELS__HFXTCLK + SELM__HFXTCLK; 	// set SMCLK and MCLK to HFXTCLK 12MHz crystal oscillator
-	CSCTL3 = DIVS__1 + DIVM__1; 				// set SMCLK divisor to 1, SMCLK = 12MHz
-	CSCTL4 |= HFFREQ_2;							// set HFX frequency to 8-16MHz, HFXTOFF = 0, turn it on
+	CSCTL2 = SELS__HFXTCLK; 	// set SMCLK and MCLK to HFXTCLK 12MHz crystal oscillator
+	CSCTL3 = DIVS__1; 				// set SMCLK divisor to 1, SMCLK = 12MHz
+	CSCTL4 |= HFFREQ_2 + HFXTDRIVE_2;			// set HFX frequency to 8-16MHz, HFXTOFF = 0, turn it on
 	CSCTL4 &= ~HFXTOFF;
 	CSCTL5 |= ENSTFCNT2;						// enable HF counter
 
@@ -30,10 +30,10 @@ int main(void) {
 		SFRIFG1 &= ~OFIFG;
 	} while (SFRIFG1&OFIFG);					// Test oscillator fault flag
 
-	CSCTL0_H = 0; 								// reset password to lock clock registers
+	CSCTL0_H = 0;
 	SFRIE1 |= OFIE; // enable oscillator fault interrupt. If there is a fault.... then what?
 
-	P1OUT |= BIT0;
+//	P1OUT |= BIT0;
 	while(1);
 	_nop();
 
@@ -52,7 +52,7 @@ __interrupt void UNMI_ISR(void)
 		SFRIFG1 &= ~OFIFG;
 		P1OUT &= ~BIT0;
 		__delay_cycles(25000);                  // time for flag to get set again
-	}while (SFRIFG1&OFIFG);                   // Test oscillator fault flag
+	} while (SFRIFG1&OFIFG);                   // Test oscillator fault flag
 
 	P1OUT |= BIT0;
 }
