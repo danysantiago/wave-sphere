@@ -19,8 +19,8 @@ void initAcc() {
 	REFCTL0 |= REFON; // Turn on voltage reference to 1.2 V
 	REFCTL0 &= ~REFTCOFF; // Disable Temperature Sensor
 
-	ADC12CTL0 |= ADC12SHT0_2 | ADC12SHT1_2 | ADC12ON; // Sampling time, S&H=16, ADC12 on, Successive Multiple Sample and Convert
-	ADC12CTL1 |= ADC12SHP; // | ADC12CONSEQ_1;                     // Use sampling timer, Select ACLK, Sequence of channel sampling mode.
+	ADC12CTL0 |= ADC12SHT0_2 | ADC12SHT1_2 | ADC12ON; // Sampling time, S&H=16, ADC12 on
+	ADC12CTL1 |= ADC12SHP; // | ADC12CONSEQ_1;                     // Use sampling timer, Select ACLK,
 	ADC12CTL2 |= ADC12RES_2;                  // 12-bit conversion results
 	//ADC12CTL2 |= ADC12PWRMD; //ADC LPM.  Samples cannot exceed 50ksps
 
@@ -31,17 +31,18 @@ void initAcc() {
 }
 
 void getAccData(int *dataArr) {
-	volatile unsigned int xSample = 0, ySample = 0, zSample = 0;
+	volatile unsigned long xSample = 0, ySample = 0, zSample = 0;
 	volatile unsigned int i = 0;
 	//unsigned int dataArr[3];
 
-	while (i < 8) {
+	while (i < 32) {
 
-		ADC12CTL3 &= ~0x1F;
+		ADC12CTL3 &= ~0x1F; // Set starting measurement to 0
 		ADC12CTL0 |= ADC12ENC | ADC12SC;        // Start sampling/conversion
 		while (!(ADC12IFGR0 & BIT0));
 
 		xSample += ADC12MEM0;
+		ADC12IFGR0 &= ~BIT0;
 		ADC12CTL0 &= ~ADC12ENC;
 
 		ADC12CTL3 = 0x1;
@@ -49,6 +50,7 @@ void getAccData(int *dataArr) {
 		while (!(ADC12IFGR0 & BIT1));
 
 		ySample += ADC12MEM1;
+		ADC12IFGR0 &= ~BIT1;
 		ADC12CTL0 &= ~ADC12ENC;
 
 		ADC12CTL3 = 0x2;
@@ -56,14 +58,15 @@ void getAccData(int *dataArr) {
 		while (!(ADC12IFGR0 & BIT2));
 
 		zSample += ADC12MEM2;
+		ADC12IFGR0 &= ~BIT2;
 		ADC12CTL0 &= ~ADC12ENC;
 
 		i = i + 1;
 	}
 
-	dataArr[0] = xSample >> 3;
-	dataArr[1] = ySample >> 3;
-	dataArr[2] = zSample >> 3;
+	dataArr[0] = xSample >> 5;
+	dataArr[1] = ySample >> 5;
+	dataArr[2] = zSample >> 5;
 
 	//return dataArr;
 

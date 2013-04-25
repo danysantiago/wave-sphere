@@ -1,7 +1,7 @@
 ******************************************************************************
                   MSP430 Linker PC v4.1.2                      
 ******************************************************************************
->> Linked Mon Apr 08 00:13:37 2013
+>> Linked Mon Apr 08 20:32:25 2013
 
 OUTPUT FILE NAME:   <Gyroscope SPI Test thing.out>
 ENTRY POINT SYMBOL: "_c_int00"  address: 00005c00

@@ -136,18 +136,44 @@ public class SerialCommunication implements SerialPortEventListener {
 					//serialWindow.printToTextArea(c);
 
 					if(c=='\n'){
+						index++;
 						sb.append(c);
 						String s = sb.toString();
-						if(s.contains("$GPRMC")){
-							//if(!s.contains("V")){
-							String[] st = s.split(",");
-							s = (st[3].length()>0? (st[3].substring(0, 2) + "\u00B0 " 
-									+ st[3].substring(2) + "' ") : "xx\u00B0 mm.dddd' ") + st[4] + ", "
-									+ (st[5].length()>0? (st[5].substring(0,3) + "\u00B0 " 
-											+ st[5].substring(3) + "' ") : "yyy\u00B0 mm.ddd' ") + st[6] + "\n";
-							if(s.length()==1)
-								s = sb.toString();
-							serialWindow.printToTextArea(s);
+						//						if(s.contains("$GPRMC")){
+						//							//if(!s.contains("V")){
+						//							String[] st = s.split(",");
+						//							s = (st[3].length()>0? (st[3].substring(0, 2) + "\u00B0 " 
+						//									+ st[3].substring(2) + "' ") : "xx\u00B0 mm.dddd' ") + st[4] + ", "
+						//									+ (st[5].length()>0? (st[5].substring(0,3) + "\u00B0 " 
+						//											+ st[5].substring(3) + "' ") : "yyy\u00B0 mm.ddd' ") + st[6] + "\n";
+						//							if(s.length()==1)
+						//								s = sb.toString();
+						//							serialWindow.printToTextArea(s);
+						//						}
+						if(index>0){
+							try {
+								
+							String[] data = s.split("\t");
+							String[] acc = data[0].split(",");
+							String[] gyro = data[1].split(",");
+							String[] mag = data[2].split(",");
+							
+							double[] accData = SensorDataConversion.convertAccData(acc);
+							double[] gyrData = SensorDataConversion.convertGyrData(gyro);
+							double[] magData = SensorDataConversion.convertMagData(mag);
+							
+							for(int j = 0; j < 3; j++) {
+								
+								serialWindow.printToTextArea("A" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", accData[j]) + " g\t");
+								serialWindow.printToTextArea("G" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", gyrData[j]) + " dps\t");
+								serialWindow.printToTextArea("M" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", magData[j]) + " gauss\t");
+								serialWindow.printToTextArea("\n" + ((j == 2) ? "\n" : ""));
+							}
+							} catch(Exception e) {
+								e.printStackTrace();
+								System.out.println("Error parsing data");
+							}
+							//serialWindow.printToTextArea("" + mag[0] + "\n");
 						}
 						sb = new StringBuilder();
 					}
