@@ -24,6 +24,22 @@ volatile struct SYSTEM_FLAG system_flags = {
 };
 
 /**
+ * SETS UP FAKE DCO CRYSTAL AT 12MHZ
+ */
+void setup_fake_crystal() {
+	CSCTL0_H = 0xA5; 							// Write password to unlock clock registers
+	CSCTL1 = DCOFSEL_6; 						// Set DCO to 24MHz
+	CSCTL1 |= DCORSEL;
+	CSCTL2 = SELS__DCOCLK + SELM__DCOCLK; 	// set SMCLK and MCLK to HFXTCLK 12MHz crystal oscillator
+	CSCTL3 = DIVS__2 + DIVM__2; 				// set SMCLK divisor to 1, SMCLK = 12MHz
+
+	P3SEL1 |= BIT4;
+	P3DIR |= BIT4; // output SMCLK on P3.4
+	CSCTL0_H = 0;
+	return;
+}
+
+/**
  * Sets up clock system
  */
 void setup_crystal() {
@@ -33,13 +49,13 @@ void setup_crystal() {
 
 	// Configure CS module
 	CSCTL0_H = 0xA5; 							// Write password to unlock clock registers
-	CSCTL1 = DCOFSEL0; 							// Set DCO to lowest speed (about 1MHz)
+	CSCTL1 = DCOFSEL_0; 						// Set DCO to 1MHz
 	CSCTL1 &= ~DCORSEL;
 	CSCTL2 = SELS__HFXTCLK + SELM__HFXTCLK; 	// set SMCLK and MCLK to HFXTCLK 12MHz crystal oscillator
-	CSCTL3 = DIVS__1; 							// set SMCLK divisor to 1, SMCLK = 12MHz
-	CSCTL4 = HFFREQ_2;							// set HFX frequency to 8-16MHz, HFXTOFF = 0, turn it on
-	CSCTL5 |= ENSTFCNT2;						// enable HF counter
-	//CSCTL0_H = 0; 								// reset password to lock clock registers
+	CSCTL3 = DIVS__1 + DIVM__1; 				// set SMCLK divisor to 1, SMCLK = 12MHz
+	CSCTL4 |= HFFREQ_2;							// set HFX frequency to 8-16MHz, HFXTOFF = 0, turn it on
+	CSCTL4 &= ~HFXTOFF;
+	CSCTL5 &= ~ENSTFCNT2;						// enable HF counter
 
 	P3SEL1 |= BIT4;
 	P3DIR |= BIT4; // output SMCLK on P3.4
@@ -49,39 +65,8 @@ void setup_crystal() {
 		SFRIFG1 &= ~OFIFG;
 	} while (SFRIFG1&OFIFG);					// Test oscillator fault flag
 
+	CSCTL0_H = 0; 								// reset password to lock clock registers
 	SFRIE1 |= OFIE; // enable oscillator fault interrupt. If there is a fault.... then what?
-	return;
-}
-
-void setup_rfwakeup(void) {
-	volatile unsigned char data;
-	data = 0;
-	P4IE |= BIT5; // enable interrupts on P4.5
-	spiInit(RF_DEVICE);
-
-	// R0
-	spi_select(RF_DEVICE);
-	sendByteWithAddressSPI(0x00, 0x0E);
-	spi_deselect(RF_DEVICE);
-
-	// R1
-	spi_select(RF_DEVICE);
-	sendByteWithAddressSPI(0x01, 0x30); // enable antenna damper
-	spi_deselect(RF_DEVICE);
-
-	// R4
-	spi_select(RF_DEVICE);
-	sendByteWithAddressSPI(0x04, 0x3F); // max damp resistance and max gain reduction ? (seems to not do anything)
-	spi_deselect(RF_DEVICE);
-
-	// R7
-	spi_select(RF_DEVICE);
-	sendByteWithAddressSPI(0x07, 0xEB); // 350msec in R7 timeout
-	spi_deselect(RF_DEVICE);
-
-	// read the data here
-	_nop();
-
 	return;
 }
 
@@ -89,14 +74,16 @@ void default_clock_system(void) {
 	// disable XF crystal
 	// put DCO in 1MHz, etc.
 	CSCTL0_H = 0xA5;						// Password
-	CSCTL1 = DCOFSEL_0;						// Set DCO = 1MHz
-	CSCTL1 &= ~DCORSEL;
+	CSCTL1 = DCOFSEL_6;						// Set DCO = 1MHz
+	CSCTL1 |= DCORSEL;
 	CSCTL2 = SELS__DCOCLK + SELM__DCOCLK;
-	CSCTL3 = DIVS__1 + DIVM__1;				// set dividers
+	CSCTL3 = DIVS__2 + DIVM__2;				// set dividers
 	CSCTL4 |= HFXTOFF;						// make sure crystal is off
-	CSCTL5 &= ~ENSTFCNT2;					// disable HF counter
+	//CSCTL5 &= ~ENSTFCNT2;					// disable HF counter
 	CSCTL0_H = 0; 								// reset password to lock clock registers
 
+	P3SEL1 |= BIT4;
+	P3DIR |= BIT4; // output SMCLK on P3.4
 	return;
 }
 
@@ -110,10 +97,24 @@ int main(void) {
 	WDTCTL = WDTPW | WDTHOLD;		// Stop watchdog timer
 	default_clock_system();
 
+	_enable_interrupts();
+	shutdown_xbee();
+	shutdown_gps();
+	__delay_cycles(100001);
+	/*
+	_nop();
+	__delay_cycles(100001);
+	wakeup_gps();
+	__delay_cycles(100001);
+	*/
+
 	for(;;) {
-		setup_rfwakeup();
+		//while(1);
+		//setup_rfwakeup();
 		// at this point, the system is shut down with RF wakeup interrupts enabled.
-		__bis_SR_register(LPM4_bits+GIE); // rf wakeup will take it out of this very low power mode
+		//__bis_SR_register(LPM4_bits+GIE); // rf wakeup will take it out of this very low power mode
+		initialize_xbee(); // xbee must be turned on after the rf wakes up the system
+		//setup_fake_crystal();
 		for(;;) {
 			__bis_SR_register(LPM0_bits+GIE);	// LPM0. XBee interrupt will take it out of this low power mode. XT on.
 			if (system_flags.shutdown_flag) {
@@ -148,18 +149,9 @@ int main(void) {
 	}
 }
 
-void turn_on_led_of_happiness(void) {
-	P2DIR |= BIT7;
-	P2OUT |= BIT7;
-	_nop();
-}
-
 #pragma vector=PORT4_VECTOR
 __interrupt void RF_Wakeup_ISR(void) {
-	// RF wakeup is in port 4.5 and it is the only pin that could cause interrupts
-	turn_on_led_of_happiness();
-	_nop();
-	while(1);
+	// RF wakeup is in port 4.5 and it is the only pin in that port that could cause interrupts
 	setup_crystal(); // turn on 12MHz crystal and switch clocks to use it
 
 	// turn off interrupt flag...
@@ -182,6 +174,7 @@ __interrupt void XBee_ISR(void)
 	case USCI_UART_UCRXIFG:
 		// This is the RX case, needed mostly for the main system flowchart.
 		received_char = UCA1RXBUF;
+
 		switch(received_char) {
 		case M_DIAGNOSTIC_CLEAR:
 			system_flags.diagnostic_flag = false;

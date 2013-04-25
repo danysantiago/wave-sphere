@@ -43,4 +43,12 @@ struct SYSTEM_FLAG {
 };
 extern volatile struct SYSTEM_FLAG system_flags;
 
+// Function declarations
+void setup_rfwakeup(void);
+void shutdown_xbee(void);
+void shutdown_gps(void);
+void wakeup_gps(void);
+void initialize_xbee(void);
+
+
 #endif
