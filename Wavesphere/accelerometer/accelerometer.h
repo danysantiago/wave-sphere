@@ -9,7 +9,7 @@
 #define ACCELEROMETER_H_
 
 void initAcc();
-void getSamples();
+void getAccData(int *dataArr);
 void accStartST();
 void accEndST();
 void accSleep();

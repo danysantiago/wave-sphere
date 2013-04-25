@@ -7,6 +7,11 @@
 #include "main.h"
 #include <msp430fr5969.h>
 #include "gps/softserial.h"
+#include "accelerometer/accelerometer.h"
+#include "gyroscope/gyroscope.h"
+#include "magnetometer/magnetometer.h"
+#include "common/spi/spi.h"
+
 #include <stdint.h>
 
 void power_on_xbee(void);
@@ -23,8 +28,44 @@ void retrieval_service(void) {
 }
 
 void sampling_service(void) {
+	volatile unsigned char data = 0;
+	int gyroArr[3];
+	int accArr[3];
+	int magArr[3];
+
 	shutdown_xbee();
-	_nop();
+
+	//Init Sensors
+		initAcc();
+		initGyro();
+		initMag();
+
+		spi_select(GYRO_DEVICE);
+
+		accStartST();
+
+		/*while(1)*/ {
+
+			spi_select(GYRO_DEVICE);
+			data = readByteSPI(0x8F);
+			spi_deselect(GYRO_DEVICE);
+
+			getGyroData(gyroArr);
+			getAccData(accArr);
+			getMagData(magArr);
+
+			/*
+			sendSensorDataUART(accArr, "");
+			sendStringUART("\t");
+			sendSensorDataUART(gyroArr, "");
+			sendStringUART("\t");
+			sendSensorDataUART(magArr, "");
+			sendStringUART("\n");
+			__delay_cycles(1500000);
+			*/
+
+		}
+
 	return;
 }
 
