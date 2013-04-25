@@ -66,6 +66,7 @@ void SoftSerial_init(void) {
 
 	P1OUT |= TX_PIN | RX_PIN;           // Initialize all GPIO
 	P1SEL0 |= TX_PIN | RX_PIN;           // Enabled Timer ISR function for TXD/RXD pins
+	P1SEL1 &= ~(TX_PIN | RX_PIN);
 	P1DIR |= TX_PIN;                    // Enable TX_PIN for output
 
 	TA0CCTL1 = OUT;                      // Set TXD Idle state as Mark = '1', +3.3 volts normal

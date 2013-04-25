@@ -42,7 +42,7 @@
  *         http://www.wormfood.net/avrbaudcalc.php and
  */
 
-#define F_CPU 8000000      // fastest clock
+#define F_CPU 12000000      // fastest clock
 #define BAUD_RATE 9600      // launchpad max speed is 9600. However an FT232RL can go faster
                             // http://www.sparkfun.com/products/718 - FT232RL Breakout Board
 #define RX_BUFFER_SIZE 16   // Set the size of the ring buffer data needs to be a power of 2
