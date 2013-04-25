@@ -21,14 +21,14 @@ int main(void) {
 	CSCTL1 &= ~DCORSEL;
 	CSCTL2 = SELS__HFXTCLK; 	// set SMCLK and MCLK to HFXTCLK 12MHz crystal oscillator
 	CSCTL3 = DIVS__1; 				// set SMCLK divisor to 1, SMCLK = 12MHz
-	CSCTL4 |= HFFREQ_2 + HFXTDRIVE_2;			// set HFX frequency to 8-16MHz, HFXTOFF = 0, turn it on
-	CSCTL4 &= ~HFXTOFF;
+	CSCTL4 |= HFFREQ_1 + HFXTDRIVE_3;			// set HFX frequency to 8-16MHz, HFXTOFF = 0, turn it on
+	//CSCTL4 &= ~HFXTOFF;
 	CSCTL5 |= ENSTFCNT2;						// enable HF counter
 
 	do {
 		CSCTL5 &= ~HFXTOFFG;   					// Clear XT1 fault flag
 		SFRIFG1 &= ~OFIFG;
-	} while (SFRIFG1&OFIFG);					// Test oscillator fault flag
+	} while (SFRIFG1 & OFIFG);					// Test oscillator fault flag
 
 	CSCTL0_H = 0;
 	SFRIE1 |= OFIE; // enable oscillator fault interrupt. If there is a fault.... then what?

@@ -99,7 +99,6 @@ void main (void)
 		}
 	}
 
-
 	pf_lseek(0); // seek to start of file
 
 	res = pf_read(line, sizeof(line), &s1); // fill up buffer and then dump it through uart
@@ -112,7 +111,6 @@ void main (void)
 		while (!(UCA1IFG&UCTXIFG));                // USCI_A0 TX buffer ready?
 		UCA1TXBUF = line[i];
 	}
-
 
 	while(1);
 }
