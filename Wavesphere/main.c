@@ -95,7 +95,8 @@ void default_clock_system(void) {
 
 void shutdown_components(void) {
 	// shutdown xbee, sensors, etc.
-	_nop();
+	shutdown_xbee();
+	shutdown_gps();
 	return;
 }
 
@@ -123,12 +124,14 @@ int main(void) {
 		initialize_xbee(); // xbee must be turned on after the rf wakes up the system
 		//setup_fake_crystal();
 		for(;;) {
+			status_service();
 			__bis_SR_register(LPM0_bits+GIE);	// LPM0. XBee interrupt will take it out of this low power mode. XT on.
 			if (system_flags.shutdown_flag) {
+				system_flags.shutdown_flag = false;
 				break;
 			}
 			else if (system_flags.diagnostic_flag) {
-				diagnostic_service(); // will send all info through the xbee once.
+				sampling_service(true); // will send all info through the xbee once.
 			}
 			else if (system_flags.retrieval_flag) {
 				system_flags.retrieval_flag = false;
@@ -136,7 +139,7 @@ int main(void) {
 			}
 			else if (system_flags.sampling_flag) {
 				// sampling flag is cleared when the device is found
-				sampling_service();
+				sampling_service(false);
 				location_service();
 			} else {
 				// status mode thingy...
