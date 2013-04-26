@@ -59,11 +59,8 @@ public class RightPanel2 extends JPanel {
 							SampleFile f = new SampleFile(fc.getSelectedFile());
 							WaveSphere.serial.setFile(f);
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
 						}
 					}
-					//TODO handle the rest.. when the user chooses a file ..etc
 
 					//TODO file choosing and serial comm should be two different listeners
 					WaveSphere.serial.setFlag(Xbee.RETRIEVAL_MODE);

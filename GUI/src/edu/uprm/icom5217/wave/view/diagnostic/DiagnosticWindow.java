@@ -105,49 +105,49 @@ public class DiagnosticWindow extends JDialog {
 	}
 	private JLabel getBatteryValueLabel() {
 		if (batteryValueLabel == null) {
-			batteryValueLabel = new JLabel("60%");
+			batteryValueLabel = new JLabel("");
 			batteryValueLabel.setName("batteryValueLabel");
 		}
 		return batteryValueLabel;
 	}
 	private JLabel getMemoryValueLabel() {
 		if (memoryValueLabel == null) {
-			memoryValueLabel = new JLabel("30%");
+			memoryValueLabel = new JLabel("");
 			memoryValueLabel.setName("memoryValueLabel");
 		}
 		return memoryValueLabel;
 	}
 	private JLabel getLocationValueLabel() {
 		if (locationValueLabel == null) {
-			locationValueLabel = new JLabel("157N 20W");
+			locationValueLabel = new JLabel("");
 			locationValueLabel.setName("locationValueLabel");
 		}
 		return locationValueLabel;
 	}
 	private JLabel getWirelssValueLabel() {
 		if (wirelssValueLabel == null) {
-			wirelssValueLabel = new JLabel("OK");
+			wirelssValueLabel = new JLabel("");
 			wirelssValueLabel.setName("wirelssValueLabel");
 		}
 		return wirelssValueLabel;
 	}
 	private JLabel getAccelerationValueLabel() {
 		if (accelerationValueLabel == null) {
-			accelerationValueLabel = new JLabel("0 g");
+			accelerationValueLabel = new JLabel("");
 			accelerationValueLabel.setName("accelerationValueLabel");
 		}
 		return accelerationValueLabel;
 	}
 	private JLabel getGyroValueLabel() {
 		if (gyroValueLabel == null) {
-			gyroValueLabel = new JLabel("0\u00B0");
+			gyroValueLabel = new JLabel("");
 			gyroValueLabel.setName("gyroValueLabel");
 		}
 		return gyroValueLabel;
 	}
 	private JLabel getMagneticValueLabel() {
 		if (magneticValueLabel == null) {
-			magneticValueLabel = new JLabel("0");
+			magneticValueLabel = new JLabel("");
 			magneticValueLabel.setName("magneticValueLabel");
 		}
 		return magneticValueLabel;

@@ -25,8 +25,8 @@ import java.util.TooManyListenersException;
 
 
 public class SerialCommunication implements SerialPortEventListener {
-	
-	private char EOF = '\n';
+
+	private char EOF = '\0';
 
 	public Xbee flag;
 
@@ -196,41 +196,40 @@ public class SerialCommunication implements SerialPortEventListener {
 					case RETRIEVAL_MODE:
 						sb.append(c);
 						if(c=='\n'){
-												
+
 							String s = sb.toString();
-							
-							
-								try {
-									
+
+
+							try {
+
 								String[] data = s.split("\t");
 								String[] acc = data[0].split(",");
 								String[] gyro = data[1].split(",");
 								String[] mag = data[2].split(",");
-								
+
 								double[] accData = SensorDataConversion.convertAccData(acc);
 								double[] gyrData = SensorDataConversion.convertGyrData(gyro);
 								double[] magData = SensorDataConversion.convertMagData(mag);
-								
+
 								for(int j = 0; j < 3; j++) {
-									
+
 									f.writeToFile("A" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", accData[j]) + " g\t");
 									f.writeToFile("G" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", gyrData[j]) + " dps\t");
 									f.writeToFile("M" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", magData[j]) + " gauss\t");
 									f.writeToFile("\n" + ((j == 2) ? "\n" : ""));
 								}
-								} catch(Exception e) {
-									e.printStackTrace();
-									System.out.println("Error parsing data");
-								}
-								//serialWindow.printToTextArea("" + mag[0] + "\n");
+							} catch(Exception e) {
+
 							}
 							sb = new StringBuilder();
-						
-						
+						}
+
+
 						if(c == EOF){//or EOF or something
 							f.flush();
 							WaveSphere.serial.setFlag(Xbee.STATUS_MODE);
 							MainWindow.normalMode();
+							new msgDialog("File saved.");
 						}
 						break;
 
@@ -247,10 +246,10 @@ public class SerialCommunication implements SerialPortEventListener {
 								String[] st = s.split(",");
 								s = (s.contains("S")? "-" : "") 
 										+ (st[3].length()>0? (st[3].substring(0, 2) + "." 
-												+ Float.toString(Float.parseFloat(st[3].substring(2))/60)) : "xx\u00B0 mm.dddd' ") + st[4] + ", "
+												+ Float.toString(Float.parseFloat(st[3].substring(2))/60)) : "00.0000") + st[4] + ", "
 												+ (s.contains("W")? "-" : "")
 												+ (st[5].length()>0? (st[5].substring(0,3) + "." 
-														+ Float.toString(Float.parseFloat(st[5].substring(3))/60)) : "yyy\u00B0 mm.ddd' ") + st[6] + "\n";
+														+ Float.toString(Float.parseFloat(st[5].substring(3))/60)) : "000.0000") + st[6] + "\n";
 
 								LocatePanel.getInstance().setLabel(s);
 								//}
@@ -266,28 +265,67 @@ public class SerialCommunication implements SerialPortEventListener {
 
 							String s = sb.toString();
 
+							//gps acc gyro mag
+
 							switch(index){
 							case 0:
-								DiagnosticWindow.getInstance().setAccelerationValueLabel(s);
-								break;
+								if(s.contains("$GPRMC")){
+									if(!s.contains("V")){
+										String[] st = s.split(",");
+										s = (s.contains("S")? "-" : "") 
+												+ (st[3].length()>0? (st[3].substring(0, 2) + "." 
+														+ Float.toString(Float.parseFloat(st[3].substring(2))/60)) : "00.0000") + st[4] + ", "
+														+ (s.contains("W")? "-" : "")
+														+ (st[5].length()>0? (st[5].substring(0,3) + "." 
+																+ Float.toString(Float.parseFloat(st[5].substring(3))/60)) : "000.0000") + st[6] + "\n";
+
+										DiagnosticWindow.getInstance().setLocationValueLabel(s);
+									}
+								}
+
 							case 1:
-								DiagnosticWindow.getInstance().setGyroValueLabel(s);
+
+								try {
+
+									String[] data = s.split("\t");
+									String[] acc = data[0].split(",");
+									String[] gyro = data[1].split(",");
+									String[] mag = data[2].split(",");
+
+									double[] accData = SensorDataConversion.convertAccData(acc);
+									double[] gyrData = SensorDataConversion.convertGyrData(gyro);
+									double[] magData = SensorDataConversion.convertMagData(mag);
+
+
+
+									DiagnosticWindow.getInstance().setAccelerationValueLabel((SensorDataConversion.AXIS_LABEL[0] + ": " + String.format("%.3f", accData[0]) + " g\t")
+											+ (SensorDataConversion.AXIS_LABEL[1] + ": " + String.format("%.3f", accData[1]) + " g\t")
+											+ (SensorDataConversion.AXIS_LABEL[2] + ": " + String.format("%.3f", accData[2]) + " g"));
+
+									DiagnosticWindow.getInstance().setGyroValueLabel((SensorDataConversion.AXIS_LABEL[0] + ": " + String.format("%.3f", gyrData[0]) + " dps\t")
+											+ (SensorDataConversion.AXIS_LABEL[1] + ": " + String.format("%.3f", gyrData[1]) + " dps\t")
+											+ (SensorDataConversion.AXIS_LABEL[2] + ": " + String.format("%.3f", gyrData[2]) + " dps"));
+
+
+									DiagnosticWindow.getInstance().setMagneticValueLabel((SensorDataConversion.AXIS_LABEL[0] + ": " + String.format("%.3f", magData[0]) + " gauss\t")
+											+ (SensorDataConversion.AXIS_LABEL[1] + ": " + String.format("%.3f", magData[1]) + " gauss\t")
+											+ (SensorDataConversion.AXIS_LABEL[2] + ": " + String.format("%.3f", magData[2]) + " gauss"));
+								} catch(Exception e) {
+
+								}
 								break;
+
 							case 2:
-								DiagnosticWindow.getInstance().setMagneticValueLabel(s);
-								break;
-							case 3:
-								DiagnosticWindow.getInstance().setLocationValueLabel(s);
-								break;
-							case 4:
 								DiagnosticWindow.getInstance().setMemoryValueLabel(s);
 								break;
-							case 5:
+
+							case 3:
 								DiagnosticWindow.getInstance().setBatteryValueLabel(s);
-								break;
+
 							default:
 								DiagnosticWindow.getInstance().setWirelssValueLabel(s);
 								index = 0;
+								break;
 							}
 							sb = new StringBuilder();
 
@@ -304,7 +342,7 @@ public class SerialCommunication implements SerialPortEventListener {
 				}
 			}
 		}catch(Exception e){
-			new msgDialog("Error getting data");
+			//new msgDialog("Error getting data");
 		}
 	}
 
