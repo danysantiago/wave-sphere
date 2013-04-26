@@ -17,10 +17,10 @@ public class MainWindow extends JFrame{
 	 * The generated serial ID
 	 */
 	private static final long serialVersionUID = 6647353545887103818L;
-	public static final String LOGO_PATH = "/img/wavespherelogo4.png";
+	public static final String LOGO_PATH = "/img/wavespherelogo3.png";
 	
 	private static MainWindow INSTANCE;
-	private static final RightPanel RETRIEVAL_PANEL = new RightPanel();
+	//private static final RightPanel RETRIEVAL_PANEL = new RightPanel();
 	private static final RightPanel2 BOTONES = RightPanel2.getInstance();
 
 	private final static JPanel defaultRightPanel = new JPanel();
@@ -36,7 +36,6 @@ public class MainWindow extends JFrame{
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MainWindow.class.getResource(LOGO_PATH)));
 		setTitle("Wave Sphere");
 		getContentPane().setLayout(new MigLayout("fill", "[]", "[]"));
-//		getContentPane().add(getSplitPane(), "cell 0 0,grow,aligny top");
 		getContentPane().add(new ConnectionPane());
 	}
 
@@ -58,13 +57,6 @@ public class MainWindow extends JFrame{
 		}
 		
 		return INSTANCE;
-	}
-	
-	public static void retrievalMode(){
-		getInstance().getSplitPane().setRightComponent(RETRIEVAL_PANEL);
-		getInstance().pack();
-		getInstance().revalidate();
-		getInstance().repaint();
 	}
 	
 	public static void normalMode(){
