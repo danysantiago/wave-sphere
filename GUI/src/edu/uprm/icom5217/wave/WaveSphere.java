@@ -18,6 +18,7 @@ public class WaveSphere{
 	public static SerialCommunication serial;
 	
 	private static  MainWindow window;
+	
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -42,6 +43,7 @@ public class WaveSphere{
 			
 			@Override
 			public void run() {
+				
 				window.pack();
 				window.setVisible(true);
 				window.setMinimumSize(window.getSize());

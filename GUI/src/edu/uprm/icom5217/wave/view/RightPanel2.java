@@ -2,58 +2,72 @@ package edu.uprm.icom5217.wave.view;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Calendar;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
 import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.utils.SampleFile;
 import edu.uprm.icom5217.wave.view.diagnostic.DiagnosticWindow;
-import edu.uprm.icom5217.wave.xbee.XBee;
+import edu.uprm.icom5217.wave.xbee.Xbee;
 
 public class RightPanel2 extends JPanel {
-	private JLabel idLabel;
+
+	private static final long serialVersionUID = 3495435543444585257L;
 	private JButton retrievalModeButton;
 	private JButton diagnosticButton;
-	private JLabel bolaIdLabel;
 	private JButton samplingModeButton;
-	private JLabel batterLevelLabel;
-	private JLabel label;
-	private JLabel memoryAvailableLabel;
-	private JLabel mbLabel;
 	private JButton turnOffButton;
-	public RightPanel2() {
-		setLayout(new MigLayout("fill", "[36.00,grow,center]", "[]5[]5[]5[]5[]5[][]"));
-		add(getIdLabel(), "flowx,cell 0 0,alignx center");
-		add(getBatterLevelLabel(), "flowx,cell 0 1");
-		add(getMemoryAvailableLabel(), "flowx,cell 0 2");
-		add(getRetrievalModeButton(), "cell 0 3");
-		add(getSamplingModeButton(), "cell 0 4");
-		add(getDiagnosticButton(), "cell 0 5");
-		add(getBolaIdLabel(), "cell 0 0");
-		add(getLabel(), "cell 0 1");
-		add(getMbLabel(), "cell 0 2");
-		add(getTurnOffButton(), "cell 0 6,alignx right");
+
+	public static RightPanel2 instance;
+	private SphereInfoPanel panel;
+
+	public static RightPanel2 getInstance(){
+		if(instance == null)
+			instance = new RightPanel2();
+
+		return instance;
 	}
 
+	private RightPanel2() {
 
-	private JLabel getIdLabel() {
-		if (idLabel == null) {
-			idLabel = new JLabel("ID:   ");
-			idLabel.setName("idLabel");
-		}
-		return idLabel;
+		setLayout(new MigLayout("fill", "[36.00,grow,center]", "[147.00,grow]5[]5[]5[][]"));
+		add(getPanel(), "cell 0 0,grow");
+		add(getRetrievalModeButton(), "cell 0 1");
+		add(getSamplingModeButton(), "cell 0 2");
+		add(getDiagnosticButton(), "cell 0 3");
+		add(getTurnOffButton(), "cell 0 4,alignx right");
 	}
 	private JButton getRetrievalModeButton() {
 		if (retrievalModeButton == null) {
 			retrievalModeButton = new JButton("Retrieval Mode");
 			retrievalModeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					WaveSphere.serial.write(XBee.lang.RETRIEVAL_MODE);
-					WaveSphere.serial.setFlag(XBee.lang.RETRIEVAL_MODE);
-					MainWindow.retrievalMode();
+					JFileChooser fc = new JFileChooser();
+					FileNameExtensionFilter filter = new FileNameExtensionFilter(
+							"Text File", "txt");
+					fc.setFileFilter(filter);
+					int ret = fc.showSaveDialog(getInstance());
+
+					if (ret == JFileChooser.APPROVE_OPTION) {
+						try {
+							SampleFile f = new SampleFile(fc.getSelectedFile());
+							WaveSphere.serial.setFile(f);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					//TODO handle the rest.. when the user chooses a file ..etc
+
+					//TODO file choosing and serial comm should be two different listeners
+					WaveSphere.serial.setFlag(Xbee.RETRIEVAL_MODE);
+					WaveSphere.serial.write(Xbee.RETRIEVAL_MODE);
 				}
 			});
 			retrievalModeButton.setName("retrievalModeButton");
@@ -65,8 +79,8 @@ public class RightPanel2 extends JPanel {
 			diagnosticButton = new JButton("Diagnostic Mode");
 			diagnosticButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
-					WaveSphere.serial.write(XBee.lang.DIAGNOSTIC_MODE);
-					WaveSphere.serial.setFlag(XBee.lang.DIAGNOSTIC_MODE);
+					WaveSphere.serial.write(Xbee.DIAGNOSTIC_MODE);
+					WaveSphere.serial.setFlag(Xbee.DIAGNOSTIC_MODE);
 					DiagnosticWindow.display("");
 				}
 			});
@@ -74,23 +88,13 @@ public class RightPanel2 extends JPanel {
 		}
 		return diagnosticButton;
 	}
-	private JLabel getBolaIdLabel() {
-		if (bolaIdLabel == null) {
-			WaveSphere.serial.write(XBee.lang.ID);
-			WaveSphere.serial.setFlag(XBee.lang.ID);
-			//TODO do something to wait for id
-			bolaIdLabel = new JLabel("827345980236");
-			bolaIdLabel.setName("bolaIdLabel");
-		}
-		return bolaIdLabel;
-	}
 	private JButton getSamplingModeButton() {
 		if (samplingModeButton == null) {
 			samplingModeButton = new JButton("Sampling Mode");
 			samplingModeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					WaveSphere.serial.write(XBee.lang.SAMPLING_MODE);
-					WaveSphere.serial.setFlag(XBee.lang.SAMPLING_MODE);
+					WaveSphere.serial.write(Xbee.SAMPLING_MODE);
+					WaveSphere.serial.setFlag(Xbee.SAMPLING_MODE);
 					Calendar c = Calendar.getInstance();
 					WaveSphere.serial.write(Long.toString(c.getTimeInMillis()));
 					MainWindow.samplingMode();
@@ -100,53 +104,39 @@ public class RightPanel2 extends JPanel {
 		}
 		return samplingModeButton;
 	}
-	private JLabel getBatterLevelLabel() {
-		if (batterLevelLabel == null) {
-			batterLevelLabel = new JLabel("Battery Level : ");
-			batterLevelLabel.setName("batterLevelLabel");
-		}
-		return batterLevelLabel;
-	}
-	private JLabel getLabel() {
-		if (label == null) {
-			label = new JLabel("60%");
-			label.setName("label");
-		}
-		return label;
-	}
-	private JLabel getMemoryAvailableLabel() {
-		if (memoryAvailableLabel == null) {
-			memoryAvailableLabel = new JLabel("Memory Available:  ");
-			memoryAvailableLabel.setName("memoryAvailableLabel");
-		}
-		return memoryAvailableLabel;
-	}
-	private JLabel getMbLabel() {
-		if (mbLabel == null) {
-			mbLabel = new JLabel("105MB");
-			mbLabel.setName("mbLabel");
-		}
-		return mbLabel;
-	}
 	private JButton getTurnOffButton() {
 		if (turnOffButton == null) {
-			turnOffButton = new JButton("Turn Off");
+			turnOffButton = new JButton("Shutdown Mode");
 			turnOffButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if(getTurnOffButton().getText().contains("Off")){
-						WaveSphere.serial.write(XBee.lang.SHUTDOWN_MODE);
-						WaveSphere.serial.setFlag(XBee.lang.SHUTDOWN_MODE);
-						getTurnOffButton().setText("Turn On");
-					}
-					else{
-						//TODO send RF signal
-						getTurnOffButton().setText("Turn Off");
-					}
-
+					WaveSphere.serial.setFlag(Xbee.STATUS_MODE);
+//					MainWindow.connectMode();
+					//TODO something in window
 				}
 			});
 			turnOffButton.setName("turnOffButton");
 		}
 		return turnOffButton;
+	}
+
+
+	public void setBolaIdLabel(String s) {
+		getPanel().setIdValue(s);
+	}
+
+
+	public void setLevelLabel(String s) {
+		getPanel().setBatteryLevelValue(s);
+	}
+
+	public void setMbLabel(String s){
+		getPanel().setMemoryValue(s);
+	}
+
+	private SphereInfoPanel getPanel() {
+		if (panel == null) {
+			panel = new SphereInfoPanel();
+		}
+		return panel;
 	}
 }

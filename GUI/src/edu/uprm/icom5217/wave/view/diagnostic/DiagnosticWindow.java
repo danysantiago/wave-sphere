@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
 import edu.uprm.icom5217.wave.WaveSphere;
-import edu.uprm.icom5217.wave.xbee.XBee;
+import edu.uprm.icom5217.wave.xbee.Xbee;
 
 public class DiagnosticWindow extends JDialog {
 	
@@ -98,7 +98,7 @@ public class DiagnosticWindow extends JDialog {
 	}
 	private JLabel getMagenticLabel() {
 		if (magenticLabel == null) {
-			magenticLabel = new JLabel("Magentic:");
+			magenticLabel = new JLabel("Magnetic:");
 			magenticLabel.setName("magenticLabel");
 		}
 		return magenticLabel;
@@ -161,7 +161,8 @@ public class DiagnosticWindow extends JDialog {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					WaveSphere.serial.write(XBee.lang.STOP_DIAGNOSTIC_MODE);
+					WaveSphere.serial.write(Xbee.STOP_DIAGNOSTIC_MODE);
+					WaveSphere.serial.setFlag(Xbee.STATUS_MODE);
 					dispose();
 					
 				}
@@ -171,7 +172,7 @@ public class DiagnosticWindow extends JDialog {
 		return stopButton;
 	}
 	
-	private static DiagnosticWindow getInstance(){
+	public static DiagnosticWindow getInstance(){
 		if(INSTANCE == null){
 			INSTANCE = new DiagnosticWindow();
 		}
@@ -182,4 +183,27 @@ public class DiagnosticWindow extends JDialog {
 	public static void display(String sphereId){
 		getInstance().setVisible(true);
 	}
+	public void setBatteryValueLabel(String s) {
+		batteryValueLabel.setText(s);
+	}
+	public void setMemoryValueLabel(String s) {
+		memoryValueLabel.setText(s);
+	}
+	public void setLocationValueLabel(String s) {
+		locationValueLabel.setText(s);
+	}
+	public void setWirelssValueLabel(String s) {
+		wirelssValueLabel.setText(s);
+	}
+	public void setAccelerationValueLabel(String s) {
+		accelerationValueLabel.setText(s);
+	}
+	public void setGyroValueLabel(String s) {
+		gyroValueLabel.setText(s);
+	}
+	public void setMagneticValueLabel(String s) {
+		magneticValueLabel.setText(s);
+	}
+	
+	
 }

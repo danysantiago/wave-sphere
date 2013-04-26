@@ -11,7 +11,7 @@ import javax.swing.border.EmptyBorder;
 
 
 public class msgDialog extends JDialog {
-
+	private static final long serialVersionUID = 6760935918208073971L;
 	private final JPanel contentPanel = new JPanel();
 
 	/**

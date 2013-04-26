@@ -18,6 +18,9 @@ import java.awt.Component;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
+import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.xbee.Xbee;
+
 public class LeftPanel extends JPanel {
 	/**
 	 * 
@@ -54,7 +57,8 @@ public class LeftPanel extends JPanel {
 			spheresList = new JList<String>();
 			spheresList.addListSelectionListener(new ListSelectionListener() {
 				public void valueChanged(ListSelectionEvent arg0) {
-					MainWindow.connectMode();
+					MainWindow.normalMode();
+					WaveSphere.serial.setFlag(Xbee.STATUS_MODE);
 				}
 			});
 			spheresList.setAlignmentY(Component.TOP_ALIGNMENT);

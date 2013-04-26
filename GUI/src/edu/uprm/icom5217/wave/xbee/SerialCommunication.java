@@ -1,6 +1,14 @@
 package edu.uprm.icom5217.wave.xbee;
 
 
+import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.utils.SampleFile;
+import edu.uprm.icom5217.wave.utils.SensorDataConversion;
+import edu.uprm.icom5217.wave.view.LocatePanel;
+import edu.uprm.icom5217.wave.view.MainWindow;
+import edu.uprm.icom5217.wave.view.RightPanel2;
+import edu.uprm.icom5217.wave.view.msgDialog;
+import edu.uprm.icom5217.wave.view.diagnostic.DiagnosticWindow;
 import gnu.io.CommPortIdentifier;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
@@ -17,29 +25,41 @@ import java.util.TooManyListenersException;
 
 
 public class SerialCommunication implements SerialPortEventListener {
-
-	public int flag;
 	
+	private char EOF = '\n';
+
+	public Xbee flag;
+
+	private boolean samplingFirstTime = true;
+
 	private  InputStream inputStream;
 	private  PrintStream outputStream;
 
 	private  SerialPort serialPort;
 
-	public SerialCommunication(){
+	private StringBuilder sb;
 
+	private int index;
+
+	private SampleFile f;
+
+	public SerialCommunication() throws IOException{
+		sb = new StringBuilder();
+		flag = Xbee.STATUS_MODE;
+		index = 0;
 	}	
 
-	public int getFlag() {
-		return flag;
+	public void setFile(SampleFile f){
+		this.f = f;
 	}
 
-
-
-	public void setFlag(int flag) {
-		this.flag = flag;
+	public void setFlag(Xbee command) {
+		this.flag = command;
 	}
 
-
+	public void resetSamplingFlag(){
+		this.samplingFirstTime = true;
+	}
 
 	public  void openSerialPort(String port, int baudRate) throws PortInUseException, UnsupportedCommOperationException, TooManyListenersException, IOException {
 		openSerialPort(port, "XBee", 0, baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE, SerialPort.FLOWCONTROL_NONE);
@@ -72,7 +92,7 @@ public class SerialCommunication implements SerialPortEventListener {
 		}
 
 		if (!found) {
-			System.out.println("Could not find port: " + port);
+			//System.out.println("Could not find port: " + port);
 			throw new NullPointerException();
 			//System.exit(1);
 		}
@@ -102,20 +122,20 @@ public class SerialCommunication implements SerialPortEventListener {
 		try {
 			serialPort.getInputStream().close();
 		} catch (Exception e) {
-			System.out.println("Exception while closing input stream");
+			//System.out.println("Exception while closing input stream");
 		}
 
 		try {
 			serialPort.getOutputStream().close();
 		} catch (Exception e) {
-			System.out.println("Exception while closing output stream");
+			//System.out.println("Exception while closing output stream");
 		}
 
 		try {
 			// this call blocks while thread is attempting to read from inputstream
 			serialPort.close();
 		} catch (Exception e) {
-			System.out.println("Exception while closing serial port");
+			//System.out.println("Exception while closing serial port");
 		}
 	}
 
@@ -134,7 +154,7 @@ public class SerialCommunication implements SerialPortEventListener {
 			break;
 
 		default:
-			System.out.println("Ignored event: " + event.getEventType());
+			//System.out.println("Ignored event: " + event.getEventType());
 			break;
 		}
 	}
@@ -144,43 +164,154 @@ public class SerialCommunication implements SerialPortEventListener {
 			if(this.getInputStream().available() > 0){
 				for(int i = 0; i < this.getInputStream().available(); i++){
 					char c = (char)this.getInputStream().read();
-					System.out.print(c);
 					//serialWindow.printToTextArea(c);
-					
+
 					switch(flag){
-					case XBee.lang.ID:
-						//print to id area
+					case STATUS_MODE:
+						sb.append(c);
+						if(c=='\n'){
+
+							String s = sb.toString();
+							switch(index){
+							case 0:
+								RightPanel2.getInstance().setBolaIdLabel(s);
+								break;
+							case 1:
+								RightPanel2.getInstance().setLevelLabel(s);
+								break;
+
+							default:
+								RightPanel2.getInstance().setMbLabel(s);
+								index = 0;
+								break;
+							}
+							sb = new StringBuilder();
+						}
+
+						else
+							index++;
+
 						break;
-					case XBee.lang.RETRIEVAL_MODE:
-						//store in temp file
+
+					case RETRIEVAL_MODE:
+						sb.append(c);
+						if(c=='\n'){
+												
+							String s = sb.toString();
+							
+							
+								try {
+									
+								String[] data = s.split("\t");
+								String[] acc = data[0].split(",");
+								String[] gyro = data[1].split(",");
+								String[] mag = data[2].split(",");
+								
+								double[] accData = SensorDataConversion.convertAccData(acc);
+								double[] gyrData = SensorDataConversion.convertGyrData(gyro);
+								double[] magData = SensorDataConversion.convertMagData(mag);
+								
+								for(int j = 0; j < 3; j++) {
+									
+									f.writeToFile("A" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", accData[j]) + " g\t");
+									f.writeToFile("G" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", gyrData[j]) + " dps\t");
+									f.writeToFile("M" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", magData[j]) + " gauss\t");
+									f.writeToFile("\n" + ((j == 2) ? "\n" : ""));
+								}
+								} catch(Exception e) {
+									e.printStackTrace();
+									System.out.println("Error parsing data");
+								}
+								//serialWindow.printToTextArea("" + mag[0] + "\n");
+							}
+							sb = new StringBuilder();
+						
+						
+						if(c == EOF){//or EOF or something
+							f.flush();
+							WaveSphere.serial.setFlag(Xbee.STATUS_MODE);
+							MainWindow.normalMode();
+						}
 						break;
-					case XBee.lang.SHUTDOWN_MODE:
-						//nothing?
+
+					case SAMPLING_MODE:
+						if(samplingFirstTime){
+							MainWindow.getInstance().getSplitPane().setRightComponent(LocatePanel.getInstance());
+							samplingFirstTime = false;
+						}
+						sb.append(c);
+						if(c=='\n'){
+							String s = sb.toString();
+							if(s.contains("$GPRMC")){
+								//if(!s.contains("V")){
+								String[] st = s.split(",");
+								s = (s.contains("S")? "-" : "") 
+										+ (st[3].length()>0? (st[3].substring(0, 2) + "." 
+												+ Float.toString(Float.parseFloat(st[3].substring(2))/60)) : "xx\u00B0 mm.dddd' ") + st[4] + ", "
+												+ (s.contains("W")? "-" : "")
+												+ (st[5].length()>0? (st[5].substring(0,3) + "." 
+														+ Float.toString(Float.parseFloat(st[5].substring(3))/60)) : "yyy\u00B0 mm.ddd' ") + st[6] + "\n";
+
+								LocatePanel.getInstance().setLabel(s);
+								//}
+							}
+							sb = new StringBuilder();
+						}
+
 						break;
-					case XBee.lang.SAMPLING_MODE:
-						//print to locate area
-						break;
-					case XBee.lang.STATUS_MODE:
-						//print to status area
-						break;
-					case XBee.lang.DIAGNOSTIC_MODE:
-						//print to diagnostic window
+
+					case DIAGNOSTIC_MODE:
+						sb.append(c);
+						if(c=='\n'){
+
+							String s = sb.toString();
+
+							switch(index){
+							case 0:
+								DiagnosticWindow.getInstance().setAccelerationValueLabel(s);
+								break;
+							case 1:
+								DiagnosticWindow.getInstance().setGyroValueLabel(s);
+								break;
+							case 2:
+								DiagnosticWindow.getInstance().setMagneticValueLabel(s);
+								break;
+							case 3:
+								DiagnosticWindow.getInstance().setLocationValueLabel(s);
+								break;
+							case 4:
+								DiagnosticWindow.getInstance().setMemoryValueLabel(s);
+								break;
+							case 5:
+								DiagnosticWindow.getInstance().setBatteryValueLabel(s);
+								break;
+							default:
+								DiagnosticWindow.getInstance().setWirelssValueLabel(s);
+								index = 0;
+							}
+							sb = new StringBuilder();
+
+						}
+
+						else
+							index++;
+
 						break;
 					default:
-						System.out.println(c);
+						//System.out.println(c);
 						break;
 					}
 				}
 			}
-			}catch(Exception e){
-				System.out.println("Error getting data");
-			}
+		}catch(Exception e){
+			new msgDialog("Error getting data");
+		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public ArrayList<String> getSerialPorts(){
 		ArrayList<String> serialPorts = new ArrayList<String>();
-		
+
 		Enumeration<CommPortIdentifier> portList = CommPortIdentifier.getPortIdentifiers();
 
 		CommPortIdentifier portId = null;
@@ -196,20 +327,26 @@ public class SerialCommunication implements SerialPortEventListener {
 
 			}
 		}
-		
+
 		return serialPorts;
 	}
-	
-	public void write(String data){
-		//outputStream.print(data);
-		//outputStream.print("\r\n"); //needed for AT commands
-		//outputStream.flush();
-	}
-	
-	public void write(int data){
-		//outputStream.write(data);
-		//outputStream.flush();
 
+	public void write(Xbee command){
+		outputStream.print(command.getCommand());
+		//outputStream.print("\r\n"); //needed for AT commands
+		outputStream.flush();
+	}
+
+	public void write(int data){
+		outputStream.write(data);
+		outputStream.flush();
+
+	}
+
+	public void write(String s) {
+		outputStream.print(s);
+		//outputStream.print("\r\n"); //needed for AT commands
+		outputStream.flush();
 	}
 
 }
