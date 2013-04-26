@@ -29,11 +29,11 @@ public class LocatePanel extends JPanel {
 
 
 	private LocatePanel() {
-		setLayout(new MigLayout("fill", "[36.00,grow,center]", "[147.00,grow]5[]5[]5[][]"));
+		setLayout(new MigLayout("fill", "[36.00,grow,center]", "[124.00,grow,bottom]5[55.00,top]5[66.00]5[][]"));
 		//add(getPanel(), "cell 0 0,grow");
 		add(getTheCurentLocationLabel(), "flowx,cell 0 0");
-		add(getLocationLabel(), "cell 0 0");
-		add(getNewButtonButton(), "cell 0 1");
+		add(getLocationLabel(), "cell 0 1");
+		add(getNewButtonButton(), "cell 0 2");
 	}
 
 

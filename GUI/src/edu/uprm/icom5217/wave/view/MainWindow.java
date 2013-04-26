@@ -17,7 +17,7 @@ public class MainWindow extends JFrame{
 	 * The generated serial ID
 	 */
 	private static final long serialVersionUID = 6647353545887103818L;
-	public static final String LOGO_PATH = "/img/wavespherelogo.png";
+	public static final String LOGO_PATH = "/img/wavespherelogo4.png";
 	
 	private static MainWindow INSTANCE;
 	private static final RightPanel RETRIEVAL_PANEL = new RightPanel();

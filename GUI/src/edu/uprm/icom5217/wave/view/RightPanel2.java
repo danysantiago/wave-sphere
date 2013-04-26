@@ -36,7 +36,7 @@ public class RightPanel2 extends JPanel {
 
 	private RightPanel2() {
 
-		setLayout(new MigLayout("fill", "[36.00,grow,center]", "[147.00,grow]5[]5[]5[][]"));
+		setLayout(new MigLayout("fill", "[36.00,grow,center]", "[]5[]5[]5[][]"));
 		add(getPanel(), "cell 0 0,grow");
 		add(getRetrievalModeButton(), "cell 0 1");
 		add(getSamplingModeButton(), "cell 0 2");
@@ -45,7 +45,7 @@ public class RightPanel2 extends JPanel {
 	}
 	private JButton getRetrievalModeButton() {
 		if (retrievalModeButton == null) {
-			retrievalModeButton = new JButton("Retrieval Mode");
+			retrievalModeButton = new JButton("Retrieval  Mode");
 			retrievalModeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					JFileChooser fc = new JFileChooser();
@@ -90,7 +90,7 @@ public class RightPanel2 extends JPanel {
 	}
 	private JButton getSamplingModeButton() {
 		if (samplingModeButton == null) {
-			samplingModeButton = new JButton("Sampling Mode");
+			samplingModeButton = new JButton(" Sampling Mode ");
 			samplingModeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					WaveSphere.serial.write(Xbee.SAMPLING_MODE);
