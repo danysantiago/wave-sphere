@@ -70,7 +70,7 @@ unsigned char i2c_read_byte(const unsigned char slaveAddr, const unsigned char b
 }
 
 /**
- * spi_receive() - send dummy btye then recv response
+ * spi_receive() - send dummy byte then recv response
  */
 void i2c_write_byte(const unsigned char slaveAddr, const unsigned char byteAddr, const unsigned char data) {
 	UCB0I2CSA = slaveAddr; // set slave address

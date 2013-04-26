@@ -13,7 +13,7 @@ void spiInit(const unsigned char device) {
 	// Configure ports for SPI
 	P2SEL1 |= BIT0 + BIT1; // data
 	P1SEL1 |= BIT5; // clk
-	P3OUT &= ~(BIT0 + BIT1 + BIT2); // all chip selects LOW, does not mean it will be deselected (some act h, some l)
+	//P3OUT &= ~(BIT0 + BIT1 + BIT2); // all chip selects LOW, does not mean it will be deselected (some act h, some l)
 	P3DIR |= BIT0 + BIT1 + BIT2; // all chip selects as outputs
 
 	// all chips deselected
@@ -36,14 +36,14 @@ void sendByteWithAddressSPI(const unsigned char address, const unsigned char dat
 	while (!(UCA0IFG & UCTXIFG)); // UCA0 tx buffer ready?
 	UCA0TXBUF = data;
 	while (!(UCA0IFG & UCTXIFG));
-	__delay_cycles(25);
+	__delay_cycles(100);
 }
 
 void sendByteSPI(const unsigned char data) {
 	while (!(UCA0IFG & UCTXIFG)); // UCA0 tx buffer ready?
 	UCA0TXBUF = data;
 	while (!(UCA0IFG & UCTXIFG));
-	__delay_cycles(25);
+	__delay_cycles(100);
 }
 
 unsigned char readByteSPI(const unsigned char address) {
