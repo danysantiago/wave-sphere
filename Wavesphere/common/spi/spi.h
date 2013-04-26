@@ -31,12 +31,12 @@
 // device selects
 #define GYRO_SELECT() GYRO_CS_PORT &= ~GYRO_CS_BIT
 #define RF_SELECT() RF_CS_PORT |= RF_CS_BIT
-#define SD_SELECT() SD_CS_PORT |= SD_CS_BIT
+#define SD_SELECT() SD_CS_PORT &= ~SD_CS_BIT
 
 // device deselects
 #define GYRO_DESELECT() GYRO_CS_PORT |= GYRO_CS_BIT
 #define RF_DESELECT() RF_CS_PORT &= ~RF_CS_BIT
-#define SD_DESELECT() SD_CS_PORT &= ~SD_CS_BIT
+#define SD_DESELECT() SD_CS_PORT |= SD_CS_BIT
 
 // SPI Speed Divisors base on the SMCLK
 #define SPI_100kHz	120 // 12MHz / 100kHz
@@ -54,7 +54,8 @@
 #define RF_SPI_1MHz 1 // DCO at 1MHz/1MHz (this is the special component that will run with SMCLK at 1MHz)
 
 #define GYRO_SPI_DIVISOR SPI_1MHz
-#define SD_SPI_DIVISOR SPI_250kHz
+#define SD_SPI_INIT_DIVISOR SPI_250kHz
+#define SD_SPI_DIVISOR SPI_4MHz
 #define RF_SPI_DIVISOR RF_SPI_1MHz
 #define SPI_DEF_SPEED SPI_4MHz // for sd card after initialization
 

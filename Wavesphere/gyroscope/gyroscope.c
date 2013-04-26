@@ -10,7 +10,7 @@
 void initGyro() {
 	spi_select(GYRO_DEVICE);
 	sendByteWithAddressSPI(0x20, 0x0F);
-	spi_select(GYRO_DEVICE);
+	spi_deselect(GYRO_DEVICE);
 }
 
 void getGyroData(int *dataArray) {

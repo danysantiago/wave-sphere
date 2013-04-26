@@ -965,7 +965,7 @@ FRESULT pf_write (
 		fs->fptr += wcnt; p += wcnt;				/* Update pointers and counters */
 		btw -= wcnt; *bw += wcnt;
 		if (((WORD)fs->fptr % 512) == 0) {
-			if (disk_writep(0, 0)) goto fw_abort;	/* Finalize the currtent secter write operation */
+			if (disk_writep(0, 0)) goto fw_abort;	/* Finalize the current sector write operation */
 			fs->flag &= ~FA__WIP;
 		}
 	}

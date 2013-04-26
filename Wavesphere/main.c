@@ -24,13 +24,14 @@ volatile struct SYSTEM_FLAG system_flags = {
 };
 
 /**
- * SETS UP FAKE DCO CRYSTAL AT 12MHZ
+ * Utility function that sets up a fake DCO 12MHz crystal.
+ * Used for when the crystal is acting up.
  */
 void setup_fake_crystal() {
 	CSCTL0_H = 0xA5; 							// Write password to unlock clock registers
 	CSCTL1 = DCOFSEL_6; 						// Set DCO to 24MHz
 	CSCTL1 |= DCORSEL;
-	CSCTL2 = SELS__DCOCLK + SELM__DCOCLK; 	// set SMCLK and MCLK to HFXTCLK 12MHz crystal oscillator
+	CSCTL2 = SELS__DCOCLK + SELM__DCOCLK; 		// set SMCLK and MCLK to HFXTCLK 12MHz crystal oscillator
 	CSCTL3 = DIVS__2 + DIVM__2; 				// set SMCLK divisor to 1, SMCLK = 12MHz
 
 	P3SEL1 |= BIT4;
@@ -40,7 +41,7 @@ void setup_fake_crystal() {
 }
 
 /**
- * Sets up clock system
+ * Sets up clock system with 12MHz crystal.
  */
 void setup_crystal() {
 	// Set PJ for HF Crystal use
@@ -55,10 +56,11 @@ void setup_crystal() {
 	CSCTL3 = DIVS__1 + DIVM__1; 				// set SMCLK divisor to 1, SMCLK = 12MHz
 	CSCTL4 |= HFFREQ_2;							// set HFX frequency to 8-16MHz, HFXTOFF = 0, turn it on
 	CSCTL4 &= ~HFXTOFF;
-	CSCTL5 &= ~ENSTFCNT2;						// enable HF counter
+	CSCTL5 |= ENSTFCNT2;						// enable HF counter
 
+	// output SMCLK on P3.4
 	P3SEL1 |= BIT4;
-	P3DIR |= BIT4; // output SMCLK on P3.4
+	P3DIR |= BIT4;
 
 	do {
 		CSCTL5 &= ~HFXTOFFG;   					// Clear XT1 fault flag
@@ -66,7 +68,10 @@ void setup_crystal() {
 	} while (SFRIFG1&OFIFG);					// Test oscillator fault flag
 
 	CSCTL0_H = 0; 								// reset password to lock clock registers
-	SFRIE1 |= OFIE; // enable oscillator fault interrupt. If there is a fault.... then what?
+
+	// enable oscillator fault interrupt. If there is a fault.... then what?
+	// TODO: could switch to DCO fake crystal if crystal is in fault/not oscillating.
+	SFRIE1 |= OFIE;
 	return;
 }
 
@@ -79,11 +84,12 @@ void default_clock_system(void) {
 	CSCTL2 = SELS__DCOCLK + SELM__DCOCLK;
 	CSCTL3 = DIVS__2 + DIVM__2;				// set dividers
 	CSCTL4 |= HFXTOFF;						// make sure crystal is off
-	//CSCTL5 &= ~ENSTFCNT2;					// disable HF counter
-	CSCTL0_H = 0; 								// reset password to lock clock registers
+//	CSCTL5 &= ~ENSTFCNT2;					// disable HF counter
+	CSCTL0_H = 0; 							// reset password to lock clock registers
 
+	// output SMCLK on P3.4
 	P3SEL1 |= BIT4;
-	P3DIR |= BIT4; // output SMCLK on P3.4
+	P3DIR |= BIT4;
 	return;
 }
 
@@ -109,10 +115,11 @@ int main(void) {
 	*/
 
 	for(;;) {
-		//while(1);
-		//setup_rfwakeup();
+
+		setup_rfwakeup();
 		// at this point, the system is shut down with RF wakeup interrupts enabled.
 		//__bis_SR_register(LPM4_bits+GIE); // rf wakeup will take it out of this very low power mode
+		P4IE &= ~BIT5; //Disable rf wakeup interrupt
 		initialize_xbee(); // xbee must be turned on after the rf wakes up the system
 		//setup_fake_crystal();
 		for(;;) {
