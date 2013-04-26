@@ -122,7 +122,7 @@ public class RightPanel2 extends JPanel {
 	}
 
 
-	public void setLevelLabel(String s) {
+	public void setBatteryLabel(String s) {
 		getPanel().setBatteryLevelValue(s);
 	}
 
