@@ -14,7 +14,7 @@
  */
 void diagnostic_service(void);
 void retrieval_service(void);
-void sampling_service(void);
+void sampling_service(bool diagnostic);
 void location_service(void);
 void status_service(void);
 

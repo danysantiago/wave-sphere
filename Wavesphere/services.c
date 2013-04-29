@@ -14,6 +14,7 @@
 #include "sdcard/sd.h"
 #include "common/i2c/i2c.h"
 #include "sdcard/pff2a/src/pff.h"
+#include "common/uart/uart.h"
 
 #include <stdint.h>
 
@@ -32,14 +33,39 @@ void diagnostic_service(void) {
  * Send requested file to Xbee
  */
 void retrieval_service(void) {
-	_nop();
+	int i;
+	FRESULT res;
+	char line[32];
+	WORD bytes_read;
+	bool done = false;
+
+	power_on_xbee();
+
+	init_sd(0); // init and make the seek
+
+	while(!done) {
+		res = pf_read(line, sizeof(line), &bytes_read); // fill up buffer and then dump it through uart
+		if (res != FR_OK) {
+			// ERROR (pichea)
+		}
+
+		for (i = 0; bytes_read > 0; bytes_read--, i++) {
+			while (!(UCA1IFG&UCTXIFG));                // USCI_A0 TX buffer ready?
+			if((UCA1TXBUF = line[i]) == '\0') {
+				done = true;
+				break;
+			}
+		}
+	}
+
 	return;
 }
 
+volatile bool flag = true;
 /**
  * Store info on SD card.
  */
-void sampling_service(void) {
+void sampling_service(bool diagnostic) {
 	volatile unsigned char data = 0;
 	int i;
 	int gyroArr[3];
@@ -48,18 +74,22 @@ void sampling_service(void) {
 	char buffer[512];
 	char buffer2[23];
 	int sector_count = 0;
+	unsigned char gps_data;
+	unsigned short gps_count;
+	int ifcount = 0;
+	int ifthingflag = false;
 
 	buffer[0] = '\0';
 	buffer2[0] = '\0';
 
-	shutdown_xbee();
+	if(!diagnostic) {
+		shutdown_xbee();
+	}
 
-	spiInit(GYRO_DEVICE);
-	spi_select(GYRO_DEVICE);
-	data = readByteSPI(0x8F); // WHO_AM_I should return 0xD4, this is just a check
-	spi_deselect(GYRO_DEVICE);
+	if(diagnostic) {
+		wakeup_gps();
+	}
 
-	_nop();
 	// init i2c
 	i2c_initialize();
 
@@ -68,42 +98,109 @@ void sampling_service(void) {
 	initGyro();
 	initMag();
 
+	// first we must set up aclk
+	CSCTL0_H = 0xA5;
+	CSCTL2 |= SELA__VLOCLK;
+	CSCTL4 &= ~VLOOFF;
+	CSCTL0_H = 0;
 
-	for(i = 20; i > 0; i--) {
+	// load capture/compares
+	TB0CCR0 = 40;
+	TA1CCR0 = 10;
+
+	// now actually set up timer b0
+	TB0CTL |= MC__UP + TBSSEL__ACLK;
+
+	// setup timer b1
+	TA1CTL |= MC__CONTINUOUS + TASSEL__ACLK;
+
+	for(i = 30; i > 0; i--) {
+		TB0CCTL0 = CCIE; // all other 0, compare mode
+		__bis_SR_register(LPM0_bits + GIE);
+		_nop();
+		TB0CCTL0 &= ~CCIE;
+
 		spiInit(GYRO_DEVICE);
 		getGyroData(gyroArr);
 		getAccData(accArr);
 		getMagData(magArr);
 
-		if(fillbuffer(buffer, buffer2, gyroArr, false)) {
-			dump_sd(buffer, buffer2, sector_count++);
-		}
-		if(fillbuffer(buffer, buffer2, accArr, false)) {
-			dump_sd(buffer, buffer2, sector_count++);
-		}
-		if(fillbuffer(buffer, buffer2, magArr, true)) {
-			dump_sd(buffer, buffer2, sector_count++);
-		}
+		if(!diagnostic) {
+			if(fillbuffer(buffer, buffer2, gyroArr, false)) {
+				dump_sd(buffer, buffer2, sector_count++);
+			}
+			if(fillbuffer(buffer, buffer2, accArr, false)) {
+				dump_sd(buffer, buffer2, sector_count++);
+			}
+			if(fillbuffer(buffer, buffer2, magArr, true)) {
+				dump_sd(buffer, buffer2, sector_count++);
+			}
+		} else {
+			i++; // loop forever
+			if(!system_flags.diagnostic_flag) {
+				break;
+			}
 
-		/*
-		init_sd(file_position);
-		//mountFile = false;
-		spi_select(SD_DEVICE);
-		file_position += write_sensor_data_sd(accArr);
-		file_position += write_sd("\t");
-		file_position += write_sensor_data_sd(gyroArr);
-		file_position += write_sd("\t");
-		file_position += write_sensor_data_sd(magArr);
-		file_position += write_sd("\r\n");
+			while (true) {
+				if (!SoftSerial_empty()) {
+					ifthingflag = true;
+					while (!(UCA1IFG&UCTXIFG));
+					gps_data = SoftSerial_read();// USCI_A0 TX buffer ready?
+					UCA1TXBUF = gps_data;
+					/*
+					if(gps_data == '\n') {
+						gps_count++;
+						if(gps_count == 6) {
+							gps_count = 0;
+							break;
+						}
+					}
+					*/
+				} else {
+					ifcount++;
+					if(ifcount >= 25052 && ifthingflag) {
+						ifcount = 0;
+						ifthingflag = false;
+						break;
+					}
+				}
+			}
+			// send stuff through UART
+			sendSensorDataUART(accArr, "");
+			sendStringUART("\t");
+			sendSensorDataUART(gyroArr, "");
+			sendStringUART("\t");
+			sendSensorDataUART(magArr, "");
+			sendStringUART("\n");
 
-		spi_deselect(SD_DEVICE);
-		 */
-
-		__delay_cycles(200000);
+			// file system information
+			sendStringUART("78%m\n");
+			// measurment from power meter
+			sendStringUART("44%b\n");
+			// xbee module signal
+			sendStringUART("-70dB\n");
+			// sendString("+++\r");
+			// receiveUART(); // two bytes
+			// sendString("DB");
+			// receiveUART();
+		}
 	}
 
-	dump_sd(buffer, buffer2, sector_count++);
+	// dump whatever is left of sd
+	if(!diagnostic) {
+		dump_sd(buffer, buffer2, sector_count++);
+	} else {
+		shutdown_gps();
+	}
+	TB0CCTL0 &= ~CCIE;
+
 	return;
+}
+
+
+#pragma vector = TIMER0_B0_VECTOR
+__interrupt void Timer_B0(void) {
+	__bic_SR_register_on_exit(LPM0_bits);
 }
 
 void location_service(void) {
@@ -128,6 +225,11 @@ void location_service(void) {
  * Maybe signal strength too.
  */
 void status_service() {
-	_nop();
+	//sphere id
+	sendStringUART("000-0001\n");
+	// file system information
+	sendStringUART("78%m\n");
+	// measurment from power meter
+	sendStringUART("44%b\n");
 	return;
 }
