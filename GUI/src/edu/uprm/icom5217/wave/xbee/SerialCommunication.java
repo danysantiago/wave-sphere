@@ -235,25 +235,25 @@ public class SerialCommunication implements SerialPortEventListener {
 
 			if(s.contains("$")){
 				if(s.contains("$GPRMC")){
-					if(!s.contains("V")){
-						String[] st = s.split(",");
-						s = (s.contains("S")? "-" : "") 
-								+ (st[3].length()>0? (st[3].substring(0, 2) + "." 
-										+ Float.toString(Float.parseFloat(st[3].substring(2))/60)) : "Invalid data") + st[4] + ", "
-										+ (s.contains("W")? "-" : "")
-										+ (st[5].length()>0? (st[5].substring(0,3) + "." 
-												+ Float.toString(Float.parseFloat(st[5].substring(3))/60)) : "no GPS signal") + st[6];
+					//if(!s.contains("V")){
+					String[] st = s.split(",");
+					s = (s.contains("S")? "-" : "") 
+							+ (st[3].length()>0? (st[3].substring(0, 2) + "." 
+									+ Float.toString(Float.parseFloat(st[3].substring(2))/60)) : "Invalid data") + st[4] + ", "
+									+ (s.contains("W")? "-" : "")
+									+ (st[5].length()>0? (st[5].substring(0,3) + "." 
+											+ Float.toString(Float.parseFloat(st[5].substring(3))/60)) : "no GPS signal") + st[6];
 
-						DiagnosticWindow.getInstance().setLocationValueLabel(s);
-					}
+					DiagnosticWindow.getInstance().setLocationValueLabel(s);
+					//}
 				}
 			}
-			else if(s.contains("db"))
+			else if(s.contains("dB"))
 				DiagnosticWindow.getInstance().setWirelssValueLabel(s);
 			else if(s.contains("%b"))
-				DiagnosticWindow.getInstance().setBatteryValueLabel(s.substring(0,s.length()-1));
+				DiagnosticWindow.getInstance().setBatteryValueLabel(s.substring(0,s.length()-2));
 			else if(s.contains("%m"))
-				DiagnosticWindow.getInstance().setMemoryValueLabel(s.substring(0,s.length()-1));
+				DiagnosticWindow.getInstance().setMemoryValueLabel(s.substring(0,s.length()-2));
 
 			else{
 
@@ -267,7 +267,6 @@ public class SerialCommunication implements SerialPortEventListener {
 					double[] accData = SensorDataConversion.convertAccData(acc);
 					double[] gyrData = SensorDataConversion.convertGyrData(gyro);
 					double[] magData = SensorDataConversion.convertMagData(mag);
-
 
 
 					DiagnosticWindow.getInstance().setAccelerationValueLabel((SensorDataConversion.AXIS_LABEL[0] + ": " + String.format("%.3f", accData[0]) + " g, ")
@@ -319,17 +318,22 @@ public class SerialCommunication implements SerialPortEventListener {
 	}
 
 	private void statusMode(char c) {
+		WaveSphere.serial.write(Xbee.STOP_DIAGNOSTIC_MODE);
+		//WaveSphere.serial.write(Xbee.STOP_LOCATE_MODE);
 		sb.append(c);
 		if(c=='\n'){
 
 			String s = sb.toString();
-			
+
 			if(s.contains("%b"))
-				RightPanel2.getInstance().setBatteryLabel(s.substring(0, s.length()-1));
+				RightPanel2.getInstance().setBatteryLabel(s.substring(0, s.length()-2));
 			else if(s.contains("%m"))
-				RightPanel2.getInstance().setMbLabel(s.substring(0, s.length()-1));
+				RightPanel2.getInstance().setMbLabel(s.substring(0, s.length()-2));
 			else
-				RightPanel2.getInstance().setBolaIdLabel(s);
+			{
+				if(s.matches("[0-9]{3}-[0-9]{4}\\n"))
+					RightPanel2.getInstance().setBolaIdLabel(s);
+			}
 			sb = new StringBuilder();
 		}
 	}

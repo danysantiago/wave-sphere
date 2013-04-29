@@ -16,7 +16,7 @@ public class SensorDataConversion {
 		
 		for(int i = 0; i < 3; i++) {
 			data[i] = Double.parseDouble(strData[i].trim());
-			data[i] = ((data[i])*(VDD/4096)-ACC_OFFSET[i])/ACC_GAIN;
+			data[i] = ((data[i])*(VDD/4096)-ACC_OFFSET[i])/ACC_GAIN + 16;
 		}
 		
 		return data;

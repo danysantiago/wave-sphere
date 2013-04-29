@@ -71,8 +71,7 @@ public class LeftPanel extends JPanel {
 				 */
 						private static final long serialVersionUID = 4832944973241303538L;
 
-						String[] values = new String[] { "Sphere1", "Sphere2",
-								"Sphere3", "Sphere4" };
+						String[] values = new String[] { "Sphere1"};//, "Sphere2", "Sphere3", "Sphere4" };
 
 						public int getSize() {
 							return values.length;
