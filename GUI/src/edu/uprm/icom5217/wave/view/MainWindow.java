@@ -87,6 +87,19 @@ public class MainWindow extends JFrame{
 		getInstance().getSplitPane().setRightComponent(new SamplingWaitScreen());
 	}
 	
+	public static void setRightPanel(JPanel panel){
+		if(isConnected){
+			getInstance().getSplitPane().setRightComponent(panel);
+		}
+		else{
+			isConnected = true;
+			getInstance().getContentPane().removeAll();
+			getInstance().getContentPane().add(getInstance().getSplitPane(), "cell 0 0,grow,aligny top");
+			getInstance().getSplitPane().setRightComponent(panel);
+			getInstance().pack();
+		}
+	}
+	
 	@Override
 	public void dispose() {
 		super.dispose();

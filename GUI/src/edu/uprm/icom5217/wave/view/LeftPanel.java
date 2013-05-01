@@ -1,8 +1,10 @@
 package edu.uprm.icom5217.wave.view;
 
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -12,13 +14,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import net.miginfocom.swing.MigLayout;
-import java.awt.Component;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
-
 import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.model.Sphere;
+import edu.uprm.icom5217.wave.model.SphereList;
 import edu.uprm.icom5217.wave.xbee.Xbee;
 
 public class LeftPanel extends JPanel {
@@ -27,7 +29,7 @@ public class LeftPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = -4124150540994039205L;
 	private JPanel scrollListContainer;
-	private JList<String> spheresList;
+	private JList<Sphere> spheresList;
 
 	private JButton addSphereButton;
 
@@ -44,6 +46,7 @@ public class LeftPanel extends JPanel {
 				BoxLayout.Y_AXIS));
 
 		JScrollPane scrollPane = new JScrollPane(getSpheresList());
+		scrollPane.setPreferredSize(new Dimension(50, 130));
 		scrollPane.setAlignmentY(Component.TOP_ALIGNMENT);
 		scrollPane.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Local Spheres:", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		scrollListContainer.add(scrollPane);
@@ -52,9 +55,9 @@ public class LeftPanel extends JPanel {
 		add(getAddSphereButton(), "cell 0 3");
 	}
 
-	private JList<String> getSpheresList() {
+	private JList<Sphere> getSpheresList() {
 		if (spheresList == null) {
-			spheresList = new JList<String>();
+			spheresList = new JList<Sphere>();
 			spheresList.addListSelectionListener(new ListSelectionListener() {
 				public void valueChanged(ListSelectionEvent arg0) {
 					MainWindow.normalMode();
@@ -63,24 +66,7 @@ public class LeftPanel extends JPanel {
 			});
 			spheresList.setAlignmentY(Component.TOP_ALIGNMENT);
 			spheresList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			spheresList.setModel(new AbstractListModel<String>() {// TODO
-																	// extract
-																	// model
-						/**
-				 * 
-				 */
-						private static final long serialVersionUID = 4832944973241303538L;
-
-						String[] values = new String[] { "Sphere1"};//, "Sphere2", "Sphere3", "Sphere4" };
-
-						public int getSize() {
-							return values.length;
-						}
-
-						public String getElementAt(int index) {
-							return values[index];
-						}
-					});
+			spheresList.setModel(SphereList.getInstance());
 		}
 
 		return spheresList;
@@ -89,6 +75,11 @@ public class LeftPanel extends JPanel {
 	private JButton getAddSphereButton() {
 		if (addSphereButton == null) {
 			addSphereButton = new JButton("  Add New Sphere ");
+			addSphereButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					MainWindow.setRightPanel(new AddSpherePanel());
+				}
+			});
 		}
 
 		return addSphereButton;
