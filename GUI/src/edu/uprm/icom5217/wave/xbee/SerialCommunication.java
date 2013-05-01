@@ -204,14 +204,29 @@ public class SerialCommunication implements SerialPortEventListener {
 				double[] accData = SensorDataConversion.convertAccData(acc);
 				double[] gyrData = SensorDataConversion.convertGyrData(gyro);
 				double[] magData = SensorDataConversion.convertMagData(mag);
+				
+				
+				f.writeToFile((SensorDataConversion.AXIS_LABEL[0] + ": " + String.format("%.3f", accData[0]) + ", ")
+						+ (SensorDataConversion.AXIS_LABEL[1] + ": " + String.format("%.3f", accData[1]) + " , ")
+						+ (SensorDataConversion.AXIS_LABEL[2] + ": " + String.format("%.3f", accData[2]) + ","));
 
-				for(int j = 0; j < 3; j++) {
+				f.writeToFile((SensorDataConversion.AXIS_LABEL[0] + ": " + String.format("%.3f", gyrData[0]) + ",")
+						+ (SensorDataConversion.AXIS_LABEL[1] + ": " + String.format("%.3f", gyrData[1]) + ",")
+						+ (SensorDataConversion.AXIS_LABEL[2] + ": " + String.format("%.3f", gyrData[2]) + ","));
 
-					f.writeToFile("A" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", accData[j]) + " g\t");
-					f.writeToFile("G" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", gyrData[j]) + " dps\t");
-					f.writeToFile("M" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", magData[j]) + " gauss\t");
-					f.writeToFile("\n" + ((j == 2) ? "\n" : ""));
-				}
+
+				f.writeToFile((SensorDataConversion.AXIS_LABEL[0] + ": " + String.format("%.3f", magData[0]) + ",")
+						+ (SensorDataConversion.AXIS_LABEL[1] + ": " + String.format("%.3f", magData[1]) + ",")
+						+ (SensorDataConversion.AXIS_LABEL[2] + ": " + String.format("%.3f", magData[2]) + "\n"));
+				
+
+//				for(int j = 0; j < 3; j++) {
+//
+//					f.writeToFile("A" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", accData[j]) + " g\t");
+//					f.writeToFile("G" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", gyrData[j]) + " dps\t");
+//					f.writeToFile("M" + SensorDataConversion.AXIS_LABEL[j] + ": " + String.format("%.3f", magData[j]) + " gauss\t");
+//					f.writeToFile("\n" + ((j == 2) ? "\n" : ""));
+//				}
 			} catch(Exception e) {
 
 			}
