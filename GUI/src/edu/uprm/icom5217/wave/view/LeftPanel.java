@@ -14,8 +14,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import sun.applet.Main;
 
 import net.miginfocom.swing.MigLayout;
 import edu.uprm.icom5217.wave.WaveSphere;
@@ -60,10 +64,13 @@ public class LeftPanel extends JPanel {
 			spheresList = new JList<Sphere>();
 			spheresList.addListSelectionListener(new ListSelectionListener() {
 				public void valueChanged(ListSelectionEvent arg0) {
+					SphereList.getInstance().setSelectedIndex(arg0.getFirstIndex());
 					MainWindow.normalMode();
 					WaveSphere.serial.setFlag(Xbee.STATUS_MODE);
+					
 				}
 			});
+			
 			spheresList.setAlignmentY(Component.TOP_ALIGNMENT);
 			spheresList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			spheresList.setModel(SphereList.getInstance());
@@ -78,6 +85,9 @@ public class LeftPanel extends JPanel {
 			addSphereButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					MainWindow.setRightPanel(new AddSpherePanel());
+					MainWindow.getInstance().pack();
+					MainWindow.getInstance().pack();
+
 				}
 			});
 		}

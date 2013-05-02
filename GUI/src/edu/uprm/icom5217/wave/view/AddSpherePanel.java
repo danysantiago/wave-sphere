@@ -27,7 +27,7 @@ public class AddSpherePanel extends JPanel {
 
 	
 	public AddSpherePanel() {
-		setLayout(new MigLayout("", "[grow,center]", "[]10[]10[]"));
+		setLayout(new MigLayout("", "[grow,center, pref!]", "[]10[]10[]"));
 		add(getIdLabel(), "flowx,cell 0 0");
 		add(getIdField(), "cell 0 0, growx");
 		add(getNameLabel(), "flowx,cell 0 1");
@@ -95,11 +95,16 @@ public class AddSpherePanel extends JPanel {
 		public void actionPerformed(ActionEvent arg0) {
 			String id = getId();
 			String name = (getName().trim().isEmpty()? id: getName().trim());
-			
+
 			if(id.matches("[0-9]{3}-[0-9]{4}"))
 			{
-				SphereList.getInstance().addElement(new Sphere(id,name));
-				MainWindow.normalMode();
+				Sphere sphere = new Sphere(id,name);
+				if(!SphereList.getInstance().contains(sphere)){
+					SphereList.getInstance().addElement(sphere);
+				}
+				else{
+					JOptionPane.showMessageDialog(parent, "Given Id already exists in list", "Error", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 			else{
 				JOptionPane.showMessageDialog(parent, "Invalid Id provided", "Error", JOptionPane.ERROR_MESSAGE);

@@ -1,5 +1,6 @@
 package edu.uprm.icom5217.wave.view;
 
+import java.awt.Component;
 import java.awt.Toolkit;
 
 import javax.swing.JFrame;
@@ -9,6 +10,7 @@ import javax.swing.JSplitPane;
 
 import net.miginfocom.swing.MigLayout;
 import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.model.SphereList;
 
 public class MainWindow extends JFrame{
 	
@@ -35,7 +37,7 @@ public class MainWindow extends JFrame{
 	public MainWindow() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MainWindow.class.getResource(LOGO_PATH)));
 		setTitle("Wave Sphere");
-		getContentPane().setLayout(new MigLayout("fill", "[]", "[]"));
+		getContentPane().setLayout(new MigLayout("fill", "[pref!]", "[]"));
 		getContentPane().add(new ConnectionPane());
 	}
 
@@ -61,20 +63,45 @@ public class MainWindow extends JFrame{
 	
 	public static void normalMode(){
 		if(isConnected){
-			getInstance().getSplitPane().setRightComponent(BOTONES);
+			getInstance().getSplitPane().setRightComponent(getNormalModeRightPanel());
 		}
 		else{
 			isConnected = true;
 			getInstance().getContentPane().removeAll();
 			getInstance().getContentPane().add(getInstance().getSplitPane(), "cell 0 0,grow,aligny top");
-			getInstance().getSplitPane().setRightComponent(BOTONES);
+			getInstance().getSplitPane().setRightComponent(getNormalModeRightPanel());
 			getInstance().pack();
 		}
-		
+		getInstance().doLayout();
 		getInstance().revalidate();
-		getInstance().repaint();
 	}
 	 
+	private static Component getNormalModeRightPanel(){
+		if(SphereList.getInstance().isEmpty()){
+			return new JPanel(){
+
+				private static final long serialVersionUID = 1877127850980758516L;
+
+				{
+					setLayout(new MigLayout("fill","grow,c","grow,c"));
+					add(new JLabel("Please add a sphere."));
+				}
+			};
+		}
+		else if(SphereList.getInstance().getSelectedIndex() < 0){
+			return new JPanel(){
+
+				private static final long serialVersionUID = 1877127850980758516L;
+
+				{
+					setLayout(new MigLayout("fill","grow,c","grow,c"));
+					add(new JLabel("Please select a sphere."));
+				}
+			};
+		}
+		
+		return BOTONES;
+	}
 	public static void connectMode(){
 		isConnected = false;
 		getInstance().getContentPane().removeAll();
@@ -83,6 +110,7 @@ public class MainWindow extends JFrame{
 		getInstance().revalidate();
 		getInstance().repaint();
 	}
+	
 	public static void samplingMode(){
 		getInstance().getSplitPane().setRightComponent(new SamplingWaitScreen());
 	}

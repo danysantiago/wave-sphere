@@ -13,7 +13,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import net.miginfocom.swing.MigLayout;
 import edu.uprm.icom5217.wave.WaveSphere;
 import edu.uprm.icom5217.wave.utils.SampleFile;
-import edu.uprm.icom5217.wave.view.diagnostic.DiagnosticWindow;
+import edu.uprm.icom5217.wave.view.diagnostic.DiagnosticPanel;
 import edu.uprm.icom5217.wave.xbee.Xbee;
 
 public class RightPanel2 extends JPanel {
@@ -78,7 +78,7 @@ public class RightPanel2 extends JPanel {
 				public void actionPerformed(ActionEvent arg0) {
 					WaveSphere.serial.write(Xbee.DIAGNOSTIC_MODE);
 					WaveSphere.serial.setFlag(Xbee.DIAGNOSTIC_MODE);
-					DiagnosticWindow.display("");
+					MainWindow.setRightPanel(new DiagnosticPanel());
 				}
 			});
 			diagnosticButton.setName("diagnosticButton");
