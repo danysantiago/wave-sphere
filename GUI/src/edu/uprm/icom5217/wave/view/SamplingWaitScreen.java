@@ -8,6 +8,10 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
 
+import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.model.SphereList;
+import edu.uprm.icom5217.wave.xbee.Xbee;
+
 import net.miginfocom.swing.MigLayout;
 
 public class SamplingWaitScreen extends JPanel{
@@ -20,8 +24,9 @@ public class SamplingWaitScreen extends JPanel{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 		   getProgressBar().setValue(++count);
-		   if(count > 30){
+		   if(count > 45){
 			   MainWindow.getInstance().getSplitPane().setRightComponent(LocatePanel.getInstance());
+			   WaveSphere.serial.write(SphereList.getInstance().get(0).getId(), Xbee.STOP_LOCATE_MODE);
 			   done();
 		   }
 		}
@@ -42,7 +47,7 @@ public class SamplingWaitScreen extends JPanel{
 	private static JProgressBar getProgressBar() {
 		if (progressBar == null) {
 			progressBar = new JProgressBar();
-			progressBar.setMaximum(30);
+			progressBar.setMaximum(45);
 			progressBar.setName("progressBar");
 		}
 		return progressBar;

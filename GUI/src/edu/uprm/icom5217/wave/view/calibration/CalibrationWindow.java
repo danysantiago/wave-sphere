@@ -7,10 +7,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
 import net.miginfocom.swing.MigLayout;
 
 public class CalibrationWindow extends JDialog {
-
+	private static final long serialVersionUID = 6447659736074279934L;
 	private final JPanel contentPanel = new JPanel();
 
 	/**

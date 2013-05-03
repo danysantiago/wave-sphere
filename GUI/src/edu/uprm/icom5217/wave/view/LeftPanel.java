@@ -14,12 +14,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import sun.applet.Main;
 
 import net.miginfocom.swing.MigLayout;
 import edu.uprm.icom5217.wave.WaveSphere;
