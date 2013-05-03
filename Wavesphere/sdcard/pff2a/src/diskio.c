@@ -257,6 +257,10 @@ DRESULT disk_writep (
 		}
 	}
 
+	if(res == RES_ERROR) {
+		_nop();
+		_nop();
+	}
 	return res;
 }
 #endif

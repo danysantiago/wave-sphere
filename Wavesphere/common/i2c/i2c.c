@@ -27,7 +27,7 @@ void i2c_initialize(void) {
 	//UCB0CTL1 |= UCSWRST;
 	UCB0CTLW0 |= UCMST + UCMODE_3;     // I2C Master, synchronous mode
 	UCB0CTLW0 |= UCSSEL_3;            // Use SMCLK, keep SW reset
-	UCB0BRW = 120;                             // fSCL = SMCLK/12 = ~100kHz
+	UCB0BRW = 35;                             // fSCL = 12M/400k = 30
 	//UCB0BR1 = 0;
 	//UCTBCNT0 = 1;
 	//UCB0CTLW1 |= UCASTP0_2;

@@ -17,7 +17,7 @@ void spiInit(const unsigned char device) {
 	P3DIR |= BIT0 + BIT1 + BIT2; // all chip selects as outputs
 
 	// all chips deselected
-	spi_deselect(GYRO_DEVICE);
+	//spi_deselect(GYRO_DEVICE);
 	spi_deselect(RF_DEVICE);
 	spi_deselect(SD_DEVICE);
 
@@ -75,12 +75,18 @@ void spi_select(const unsigned char device) {
 	switch(device) {
 	case GYRO_DEVICE: //GYRO
 		GYRO_SELECT();
+		SD_DESELECT();
+		RF_DESELECT();
 		break;
 	case SD_DEVICE:
 		SD_SELECT();
+		GYRO_DESELECT();
+		RF_DESELECT();
 		break;
 	case RF_DEVICE:
 		RF_SELECT();
+		GYRO_DESELECT();
+		SD_DESELECT();
 		break;
 	default:
 		break;

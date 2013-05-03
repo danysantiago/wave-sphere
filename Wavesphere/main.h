@@ -31,6 +31,7 @@ void status_service(void);
 #define M_SAMPLING_SET 3
 #define M_SAMPLING_CLEAR 4
 #define M_SHUTDOWN_SET 5
+#define M_LOCATE_SET 6
 
 /**
  * Flags for System Flow
@@ -40,8 +41,10 @@ struct SYSTEM_FLAG {
 	bool retrieval_flag;
 	bool sampling_flag;
 	bool shutdown_flag;
+	bool locate_flag;
 };
 extern volatile struct SYSTEM_FLAG system_flags;
+extern const char id[9];
 
 // Function declarations
 void setup_rfwakeup(void);

@@ -5,20 +5,16 @@
  *      Author: Adrian
  */
 
-#include "../common/spi/spi.h"
+#include "../common/i2c/i2c.h"
 
 void initGyro() {
-	spi_select(GYRO_DEVICE);
-	sendByteWithAddressSPI(0x20, 0x0F);
-	spi_deselect(GYRO_DEVICE);
+	i2c_write_byte(0x6A, 0x20, 0x0F);
 }
 
 void getGyroData(int *dataArray) {
 	unsigned char gyroArr[6];
 
-	spi_select(GYRO_DEVICE);
-	readMultipleBytesSPI(0xE8, 6, gyroArr);
-	spi_deselect(GYRO_DEVICE);
+	i2c_read_mult_bytes(0x6A, 0xE8, 6, gyroArr);
 
 	dataArray[0] = (int) ((gyroArr[0] << 8) | gyroArr[1]);
 	dataArray[1] = (int) ((gyroArr[2] << 8) | gyroArr[3]);
