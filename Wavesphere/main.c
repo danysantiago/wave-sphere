@@ -31,7 +31,7 @@ const char id[9] = "000-0001";
  * Utility function that sets up a fake DCO 12MHz crystal.
  * Used for when the crystal is acting up.
  */
-void setup_fake_crystal() {
+void setup_fcrystal() {
 	CSCTL0_H = 0xA5; 							// Write password to unlock clock registers
 	CSCTL1 = DCOFSEL_6; 						// Set DCO to 24MHz
 	CSCTL1 |= DCORSEL;
@@ -73,8 +73,6 @@ void setup_crystal() {
 
 	CSCTL0_H = 0; 								// reset password to lock clock registers
 
-	// enable oscillator fault interrupt. If there is a fault.... then what?
-	// TODO: could switch to DCO fake crystal if crystal is in fault/not oscillating.
 	SFRIE1 |= OFIE;
 	return;
 }
@@ -88,7 +86,6 @@ void default_clock_system(void) {
 	CSCTL2 = SELS__DCOCLK + SELM__DCOCLK;
 	CSCTL3 = DIVS__2 + DIVM__2;				// set dividers
 	CSCTL4 |= HFXTOFF;						// make sure crystal is off
-	//	CSCTL5 &= ~ENSTFCNT2;					// disable HF counter
 	CSCTL0_H = 0; 							// reset password to lock clock registers
 
 	// output SMCLK on P3.4
@@ -112,21 +109,15 @@ int main(void) {
 	shutdown_xbee();
 	shutdown_gps();
 	__delay_cycles(100001);
-	/*
-	_nop();
-	__delay_cycles(100001);
-	wakeup_gps();
-	__delay_cycles(100001);
-	 */
 
 	for(;;) {
 
 		setup_rfwakeup();
 		// at this point, the system is shut down with RF wakeup interrupts enabled.
-		//__bis_SR_register(LPM4_bits+GIE); // rf wakeup will take it out of this very low power mode
+		__bis_SR_register(LPM4_bits+GIE); // rf wakeup will take it out of this very low power mode
 		P4IE &= ~BIT5; //Disable rf wakeup interrupt
 		initialize_xbee(); // xbee must be turned on after the rf wakes up the system
-		//setup_fake_crystal();
+
 		for(;;) {
 			status_service();
 			__bis_SR_register(LPM0_bits+GIE);	// LPM0. XBee interrupt will take it out of this low power mode. XT on.
@@ -173,10 +164,8 @@ __interrupt void RF_Wakeup_ISR(void) {
 	// RF wakeup is in port 4.5 and it is the only pin in that port that could cause interrupts
 	setup_crystal(); // turn on 12MHz crystal and switch clocks to use it
 
-	// turn off interrupt flag...
+	// turn off interrupt flag
 	P4IFG &= ~BIT5;
-
-	//TODO CLEAR WAKE, SEND SPI COMMANDS TO DO THIS
 
 	// wake up CPU on exit
 	__bic_SR_register_on_exit(LPM4_bits);

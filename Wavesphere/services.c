@@ -74,7 +74,7 @@ void sampling_service(bool diagnostic) {
 	char buffer2[48];
 	int sector_count = 0;
 	unsigned char gps_data;
-	unsigned short gps_count;
+
 	int ifcount = 0;
 	int ifthingflag = false;
 	FATFS fs;
@@ -128,7 +128,6 @@ void sampling_service(bool diagnostic) {
 
 		TB0CCTL0 &= ~CCIE;
 
-
 		getAccData(accArr);
 		getGyroData(gyroArr);
 		getMagData(magArr);
@@ -153,17 +152,8 @@ void sampling_service(bool diagnostic) {
 				if (!SoftSerial_empty()) {
 					ifthingflag = true;
 					while (!(UCA1IFG&UCTXIFG));
-					gps_data = SoftSerial_read();// USCI_A0 TX buffer ready?
+					gps_data = SoftSerial_read(); // USCI_A0 TX buffer ready?
 					UCA1TXBUF = gps_data;
-					/*
-					if(gps_data == '\n') {
-						gps_count++;
-						if(gps_count == 6) {
-							gps_count = 0;
-							break;
-						}
-					}
-					 */
 				} else {
 					ifcount++;
 					if(ifcount >= 25052 && ifthingflag) {
@@ -187,10 +177,6 @@ void sampling_service(bool diagnostic) {
 			sendStringUART("44%b\n");
 			// xbee module signal
 			sendStringUART("-70dB\n");
-			// sendString("+++\r");
-			// receiveUART(); // two bytes
-			// sendString("DB");
-			// receiveUART();
 		}
 	}
 

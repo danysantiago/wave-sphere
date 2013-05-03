@@ -4,7 +4,6 @@
  *  Created on: Apr 25, 2013
  *      Author: Samuel
  */
-//TODO ADD CHECKS. THIS IS A "PUERCÁ'"
 
 #include "pff2a/src/diskio.h"
 #include "pff2a/src/pff.h"
@@ -34,20 +33,13 @@ void init_sd(DWORD initial_seek, FATFS *fs) {
 
 	while(pf_mount(fs));
 	while(pf_open("WRITE.TXT"));
-//	while(pf_lseek(initial_seek) != FR_OK);
 	return;
 }
 
 DWORD write_sd(char *string) {
-	//TODO ADD CHECKS
 	WORD bytes_written;
 	int len = strlen(string);
-	while(pf_write(string, len, &bytes_written)); // pig
-//	if (res != FR_OK) {
-//		//break;
-//		_nop();
-//	}
-
+	while(pf_write(string, len, &bytes_written));
 	return bytes_written;
 }
 
@@ -55,7 +47,6 @@ DWORD finalize_write_sd(void) {
 	WORD bytes_written;
 	while(pf_write(0, 0, &bytes_written)); // finalize the write process
 	if (res != FR_OK) {
-		// error
 		_nop();
 	}
 	return bytes_written;
@@ -66,23 +57,23 @@ void unmount_file_sd(void) {
 	return;
 }
 
-//TODO ADD CHECKS
-bool fillbuffer(char *buffer, char *buffer2, int *arr, unsigned long timestamp, bool final_array, bool writetimestamp) {
+bool fillbuffer(char *buffer, char *buffer2, int *arr, unsigned long timestamp,
+		bool final_array, bool writetimestamp) {
 	unsigned int buffer_length = strlen(buffer);
 	unsigned int buffer2_length;
-	unsigned int i, j, left;
+	unsigned int i, j;
 	char timestampString[13];
 
 	ltoa(timestamp, timestampString);
 	i = 0;
 	while(timestampString[i++]);
-	i--; // super puerco
+	i--;
 	timestampString[i++] = '\t';
 	timestampString[i++] = '\0';
 	timestampString[i] = '\0';
-	sprintf(buffer2, "%s%d, %d, %d%s", writetimestamp ? timestampString : "", arr[0], arr[1], arr[2], final_array ? "\r\n" : "\t");
+	sprintf(buffer2, "%s%d, %d, %d%s", writetimestamp ? timestampString : "",
+			arr[0], arr[1], arr[2], final_array ? "\r\n" : "\t");
 	buffer2_length = strlen(buffer2);
-
 
 	if(buffer_length + buffer2_length > 512) {
 		// we are over, pass whatever you can to buffer1 and then rotate buff2
@@ -90,12 +81,8 @@ bool fillbuffer(char *buffer, char *buffer2, int *arr, unsigned long timestamp, 
 			buffer[buffer_length] = buffer2[i];
 		}
 
-		//left = buffer2_length - i;
 		j = 0;
-		while(buffer2[j++] = buffer2[i++]);
-		//for (j = 0; j < left; j++, i++) {
-		//	buffer2[j] = buffer2[i];
-		//}
+		while(buffer2[j++] = buffer2[i++]); // shift buffer
 		buffer2[j] = '\0';
 		buffer[512] = '\0';
 		return true;
@@ -111,12 +98,7 @@ bool fillbuffer(char *buffer, char *buffer2, int *arr, unsigned long timestamp, 
 }
 
 void dump_sd(char *buffer, char *buffer2, int sector_count) {
-	//init_sd(sector_count * 512); // make the seek
-	//spi_select(SD_DEVICE);
 	write_sd(buffer);
-	//finalize_write_sd();
-	//unmount_file_sd();
-	//spi_deselect(SD_DEVICE);
 	unsigned int i;
 	for(i = 0; buffer2[i] != '\0'; i++) {
 		buffer[i] = buffer2[i];

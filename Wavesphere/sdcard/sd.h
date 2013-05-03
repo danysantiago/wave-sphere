@@ -15,7 +15,8 @@ DWORD finalize_write_sd(void);
 DWORD write_sensor_data_sd(int *arr);
 void unmount_file_sd(void);
 void dump_sd(char *buffer, char *buffer2, int sector_count);
-bool fillbuffer(char *buffer, char *buffer2, int *arr, unsigned long timestamp, bool final_array, bool writetimestamp);
+bool fillbuffer(char *buffer, char *buffer2, int *arr,
+		unsigned long timestamp, bool final_array, bool writetimestamp);
 
 #define SELECT_PASS_MODE()	P1OUT &= ~BIT3
 #define DESELECT_PASS_MODE()	P1OUT |= BIT3
