@@ -1,14 +1,15 @@
 package edu.uprm.icom5217.wave.view.calibration;
 
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
-import javax.swing.UIManager;
-import net.miginfocom.swing.MigLayout;
 import javax.swing.JLabel;
-import com.jgoodies.forms.factories.DefaultComponentFactory;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
+
+import net.miginfocom.swing.MigLayout;
 
 public class CalibrationPane extends JPanel {
+	private static final long serialVersionUID = -7774973064203837802L;
 	private JLabel xLabel;
 	private JLabel scaleLabel;
 	private JLabel offsetLabel;

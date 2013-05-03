@@ -2,6 +2,7 @@ package edu.uprm.icom5217.wave.xbee;
 
 
 import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.model.Sphere;
 import edu.uprm.icom5217.wave.model.SphereList;
 import edu.uprm.icom5217.wave.utils.SampleFile;
 import edu.uprm.icom5217.wave.utils.SensorDataConversion;
@@ -83,7 +84,6 @@ public class SerialCommunication implements SerialPortEventListener {
 
 			if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
 				if (portId.getName().equals(port)) {
-					//log.debug("Using Port: " + portId.getName());
 					found = true;
 					break;
 				}
@@ -91,9 +91,7 @@ public class SerialCommunication implements SerialPortEventListener {
 		}
 
 		if (!found) {
-			//System.out.println("Could not find port: " + port);
 			throw new NullPointerException();
-			//System.exit(1);
 		}
 
 
@@ -198,14 +196,16 @@ public class SerialCommunication implements SerialPortEventListener {
 			try {
 
 				String[] data = s.split("\t");
-				String[] acc = data[0].split(",");
-				String[] gyro = data[1].split(",");
-				String[] mag = data[2].split(",");
+				String time = data[0];
+				String[] acc = data[1].split(",");
+				String[] gyro = data[2].split(",");
+				String[] mag = data[3].split(",");
 
 				double[] accData = SensorDataConversion.convertAccData(acc);
 				double[] gyrData = SensorDataConversion.convertGyrData(gyro);
 				double[] magData = SensorDataConversion.convertMagData(mag);
 				
+				f.writeToFile(time + ",");
 				
 				f.writeToFile((SensorDataConversion.AXIS_LABEL[0] + ": " + String.format("%.3f", accData[0]) + ", ")
 						+ (SensorDataConversion.AXIS_LABEL[1] + ": " + String.format("%.3f", accData[1]) + " , ")
@@ -332,10 +332,11 @@ public class SerialCommunication implements SerialPortEventListener {
 
 			String s = sb.toString();
 
-			if(s.contains("%b"))
-				RightPanel2.getInstance().setBatteryLabel(s.substring(0, s.length()-2));
-			else if(s.contains("%m"))
+			
+			if(s.contains("%m"))
 				RightPanel2.getInstance().setMbLabel(s.substring(0, s.length()-2));
+			else if(s.matches("[0-9]{2}%b\\n"))
+				RightPanel2.getInstance().setBatteryLabel(s.substring(0, s.length()-2));
 			else
 			{
 				if(s.matches("[0-9]{3}-[0-9]{4}\\n"))
@@ -384,6 +385,16 @@ public class SerialCommunication implements SerialPortEventListener {
 	public void write(String s) {
 		outputStream.print(s);
 		outputStream.flush();
+	}
+	
+	public void write(String string, Xbee command){
+		outputStream.print(string + " " + command.getCommand());
+		outputStream.flush();
+	}
+
+	public void write(Sphere sphere, Xbee stopLocateMode) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

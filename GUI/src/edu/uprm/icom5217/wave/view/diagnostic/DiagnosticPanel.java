@@ -183,24 +183,32 @@ public class DiagnosticPanel extends JPanel {
 	}
 	public void setBatteryValueLabel(String s) {
 		batteryValueLabel.setText(s);
+		batteryValueLabel.paintImmediately(batteryValueLabel.getVisibleRect());
 	}
 	public void setMemoryValueLabel(String s) {
 		memoryValueLabel.setText(s);
+		memoryValueLabel.paintImmediately(memoryValueLabel.getVisibleRect());
 	}
 	public void setLocationValueLabel(String s) {
 		locationValueLabel.setText(s);
+		locationValueLabel.paintImmediately(locationValueLabel.getVisibleRect());
 	}
 	public void setWirelssValueLabel(String s) {
 		wirelssValueLabel.setText(s);
+		wirelssValueLabel.paintImmediately(wirelssValueLabel.getVisibleRect());
 	}
 	public void setAccelerationValueLabel(String s) {
 		accelerationValueLabel.setText(s);
+		accelerationValueLabel.paintImmediately(accelerationValueLabel.getVisibleRect());
 	}
 	public void setGyroValueLabel(String s) {
 		gyroValueLabel.setText(s);
+		gyroValueLabel.paintImmediately(gyroValueLabel.getVisibleRect());
 	}
 	public void setMagneticValueLabel(String s) {
 		magneticValueLabel.setText(s);
+		System.out.println(s);
+		magneticValueLabel.paintImmediately(magneticValueLabel.getVisibleRect());
 	}
 	
 	

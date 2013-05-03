@@ -9,6 +9,8 @@ import javax.swing.JPanel;
 
 import net.miginfocom.swing.MigLayout;
 import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.model.Sphere;
+import edu.uprm.icom5217.wave.model.SphereList;
 import edu.uprm.icom5217.wave.xbee.Xbee;
 
 public class LocatePanel extends JPanel {
@@ -16,10 +18,13 @@ public class LocatePanel extends JPanel {
 	private static final long serialVersionUID = -7898091034199268682L;
 	private JLabel theCurentLocationLabel;
 	private JLabel locationLabel;
-	private JButton newButtonButton;
+	private JButton cancelButton;
 
 	private static LocatePanel instance;
+	private JButton NextButton;
 
+	private int currentSphereIndex;
+	
 	public static LocatePanel getInstance(){
 		if(instance == null)
 			instance = new LocatePanel();
@@ -33,10 +38,10 @@ public class LocatePanel extends JPanel {
 		//add(getPanel(), "cell 0 0,grow");
 		add(getTheCurentLocationLabel(), "flowx,cell 0 0");
 		add(getLocationLabel(), "cell 0 1");
-		add(getNewButtonButton(), "cell 0 2");
+		add(getNextButton(), "flowx,cell 0 2");
+		add(getCancelButton(), "cell 0 2");
+		currentSphereIndex = 0;
 	}
-
-
 
 	private JLabel getTheCurentLocationLabel() {
 		if (theCurentLocationLabel == null) {
@@ -45,29 +50,63 @@ public class LocatePanel extends JPanel {
 		}
 		return theCurentLocationLabel;
 	}
+	
 	private JLabel getLocationLabel() {
 		if (locationLabel == null) {
-			locationLabel = new JLabel("");
+			locationLabel = new JLabel("                   ");
 		}
 		return locationLabel;
 	}
-	private JButton getNewButtonButton() {
-		if (newButtonButton == null) {
-			newButtonButton = new JButton("Exit");
-			newButtonButton.addActionListener(new ActionListener() {
+	
+	private JButton getCancelButton() {
+		if (cancelButton == null) {
+			cancelButton = new JButton("Cancel");
+			cancelButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					WaveSphere.serial.write(Xbee.STOP_LOCATE_MODE);
+					WaveSphere.serial.write(SphereList.getInstance().get(currentSphereIndex).getId(), Xbee.STOP_LOCATE_MODE);
 					WaveSphere.serial.setFlag(Xbee.STATUS_MODE);	
 					WaveSphere.serial.resetSamplingFlag();
 					MainWindow.normalMode();
 				}
 			});
-			newButtonButton.setName("newButtonButton");
+			cancelButton.setName("cancelButton");
 		}
-		return newButtonButton;
+		return cancelButton;
 	}
 
 	public void setLabel(String s){
+		getTheCurentLocationLabel().setText("The current location of " + getCurrentSphere().getName() + "is: ");
 		locationLabel.setText(s);
+	}
+	
+	public Sphere getCurrentSphere(){
+		return SphereList.getInstance().get(currentSphereIndex);
+	}
+	
+	private JButton getNextButton() {
+		if (NextButton == null) {
+			NextButton = new JButton("Next");
+			NextButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					WaveSphere.serial.write(SphereList.getInstance().get(currentSphereIndex++).getId(), Xbee.STOP_LOCATE_MODE);
+					if(currentSphereIndex >= SphereList.getInstance().getSize()) //last sphere
+					{
+						WaveSphere.serial.setFlag(Xbee.STATUS_MODE);	
+						WaveSphere.serial.resetSamplingFlag();
+						MainWindow.normalMode();
+					}
+					else
+					{
+						
+						Sphere nextSphere = SphereList.getInstance().get(currentSphereIndex);
+						//TODO get location of next sphere
+						WaveSphere.serial.write(nextSphere.getId(), Xbee.LOCATE_MODE);
+					}
+				
+				}
+			});
+			NextButton.setName("NextButton");
+		}
+		return NextButton;
 	}
 }
