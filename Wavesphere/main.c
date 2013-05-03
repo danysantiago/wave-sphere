@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include "main.h"
 #include "common/spi/spi.h"
+#include <string.h>
 
 /**
  * System Flags Structure
@@ -20,8 +21,11 @@ volatile struct SYSTEM_FLAG system_flags = {
 		false, // .diagnostic_flag = false,
 		false, //.retreival_flag = false,
 		false, //.sampling_flag = false,
-		false //.shutdown_flag = false
+		false, //.shutdown_flag = false,
+		false  //.locate_flag = false
 };
+
+const char id[9] = "000-0001";
 
 /**
  * Utility function that sets up a fake DCO 12MHz crystal.
@@ -84,7 +88,7 @@ void default_clock_system(void) {
 	CSCTL2 = SELS__DCOCLK + SELM__DCOCLK;
 	CSCTL3 = DIVS__2 + DIVM__2;				// set dividers
 	CSCTL4 |= HFXTOFF;						// make sure crystal is off
-//	CSCTL5 &= ~ENSTFCNT2;					// disable HF counter
+	//	CSCTL5 &= ~ENSTFCNT2;					// disable HF counter
 	CSCTL0_H = 0; 							// reset password to lock clock registers
 
 	// output SMCLK on P3.4
@@ -113,7 +117,7 @@ int main(void) {
 	__delay_cycles(100001);
 	wakeup_gps();
 	__delay_cycles(100001);
-	*/
+	 */
 
 	for(;;) {
 
@@ -140,8 +144,13 @@ int main(void) {
 			else if (system_flags.sampling_flag) {
 				// sampling flag is cleared when the device is found
 				sampling_service(false);
+				//location_service();
+			}
+			else if (system_flags.locate_flag) {
 				location_service();
-			} else {
+				system_flags.locate_flag = false;
+			}
+			else {
 				// status mode thingy...
 				status_service(); // will send status info through the xbee once.
 			}
@@ -178,12 +187,42 @@ __interrupt void RF_Wakeup_ISR(void) {
 __interrupt void XBee_ISR(void)
 {
 	unsigned char received_char;
+	char receivedId[9];
+	int i = 0;
+
 	switch(__even_in_range(UCA1IV,USCI_UART_UCTXCPTIFG))
 	{
 	case USCI_NONE: break;
 	case USCI_UART_UCRXIFG:
 		// This is the RX case, needed mostly for the main system flowchart.
+		// will receive ID command
+		// XXX-XXXX 3, for example
+		// receive 8 bytes, confirm 9th byte is a space, then receive command
+
+		receivedId[0] = UCA1RXBUF;
+		// receive next 7 bytes
+		for(i = 1; i < 8; i++) {
+			while (!(UCA1IFG & UCRXIFG));
+			receivedId[i] = UCA1RXBUF;
+		}
+		receivedId[8] = '\0';
+
+		// confirm space
+		while (!(UCA1IFG & UCRXIFG));
+		if(UCA1RXBUF == ' ') {
+			_nop(); // do something?
+		}
+
+		// get received char
+		while (!(UCA1IFG & UCRXIFG));
+
+
 		received_char = UCA1RXBUF;
+
+		if(strcmp(id, receivedId)) {
+			// strings are not the same...
+			return;
+		}
 
 		switch(received_char) {
 		case M_DIAGNOSTIC_CLEAR:
@@ -200,9 +239,13 @@ __interrupt void XBee_ISR(void)
 			break;
 		case M_SAMPLING_CLEAR:
 			system_flags.sampling_flag = false;
+			system_flags.locate_flag = false;
 			break;
 		case M_SHUTDOWN_SET:
 			system_flags.shutdown_flag = true;
+			break;
+		case M_LOCATE_SET:
+			system_flags.locate_flag = true;
 			break;
 		default:
 			break;

@@ -53,7 +53,7 @@
 
 #define RF_SPI_1MHz 1 // DCO at 1MHz/1MHz (this is the special component that will run with SMCLK at 1MHz)
 
-#define GYRO_SPI_DIVISOR SPI_1MHz
+#define GYRO_SPI_DIVISOR SPI_4MHz
 #define SD_SPI_INIT_DIVISOR SPI_250kHz
 #define SD_SPI_DIVISOR SPI_4MHz
 #define RF_SPI_DIVISOR RF_SPI_1MHz
