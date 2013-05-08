@@ -22,6 +22,39 @@ void power_on_xbee(void) {
 	return;
 }
 
+int xbee_signal_strength(void) {
+	int i;
+	int result = 0;
+	volatile char dummy;
+
+	char command[] = "ATDB\r\n";
+	for(i = 0; i < 3; i++) {
+		while (!(UCA1IFG&UCTXIFG)); // wait
+		UCA1TXBUF = '+';
+	}
+
+	// receive OK
+	for(i = 0; i < 2; i++) {
+		while (!(UCA1IFG & UCRXIFG)); // wait for OK
+		dummy = UCA1RXBUF;
+	}
+
+	// send ATDB\r\n
+	for(i = 0; i < 6; i++) {
+		while (!(UCA1IFG&UCTXIFG)); // wait
+		UCA1TXBUF = command[i];
+	}
+
+	// receive signal strength (2 chars)
+	while (!(UCA1IFG & UCRXIFG)); // wait for OK
+	result = UCA1RXBUF;
+	result <<= 8;
+	while (!(UCA1IFG & UCRXIFG));
+	result += UCA1RXBUF;
+
+	return result;
+}
+
 void initialize_xbee(void) {
 	P4DIR |= BIT6;
 	P4OUT &= ~BIT6;

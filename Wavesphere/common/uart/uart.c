@@ -28,6 +28,13 @@ void sendStringUART(char *string) {
 	}
 }
 
+void sendWordUART(int data) {
+	while (!(UCA1IFG & UCTXIFG));
+	UCA1TXBUF = data & 0xFF00;
+	while (!(UCA1IFG & UCTXIFG));
+	UCA1TXBUF = data & 0x00FF;
+}
+
 void sendByteUART(unsigned char byte) {
 	while (!(UCA1IFG & UCTXIFG)); // wait for buffer availability (TX)
 	UCA1TXBUF = byte;

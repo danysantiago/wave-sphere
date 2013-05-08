@@ -77,14 +77,31 @@ void setup_crystal() {
 	return;
 }
 
+void setup_fake_crystal(void) {
+	// disable XF crystal
+	// put DCO in 1MHz, etc.
+	CSCTL0_H = 0xA5;						// Password
+	CSCTL1 = DCOFSEL_6;						// Set DCO = 24MHz
+	CSCTL1 |= DCORSEL;
+	CSCTL2 = SELS__DCOCLK + SELM__DCOCLK;
+	CSCTL3 = DIVS__2 + DIVM__2;				// set dividers
+	CSCTL4 |= HFXTOFF;						// make sure crystal is off
+	CSCTL0_H = 0; 							// reset password to lock clock registers
+
+	// output SMCLK on P3.4
+	P3SEL1 |= BIT4;
+	P3DIR |= BIT4;
+	return;
+}
+
 void default_clock_system(void) {
 	// disable XF crystal
 	// put DCO in 1MHz, etc.
 	CSCTL0_H = 0xA5;						// Password
-	CSCTL1 = DCOFSEL_6;						// Set DCO = 1MHz
-	CSCTL1 |= DCORSEL;
+	CSCTL1 = DCOFSEL_0;						// Set DCO = 1MHz
+	CSCTL1 &= ~DCORSEL;
 	CSCTL2 = SELS__DCOCLK + SELM__DCOCLK;
-	CSCTL3 = DIVS__2 + DIVM__2;				// set dividers
+	CSCTL3 = DIVS__1 + DIVM__1;				// set dividers
 	CSCTL4 |= HFXTOFF;						// make sure crystal is off
 	CSCTL0_H = 0; 							// reset password to lock clock registers
 
@@ -105,8 +122,8 @@ int main(void) {
 	WDTCTL = WDTPW | WDTHOLD;		// Stop watchdog timer
 	default_clock_system();
 
-	_enable_interrupts();
 	shutdown_xbee();
+	_enable_interrupts();
 	shutdown_gps();
 	__delay_cycles(100001);
 
@@ -162,7 +179,7 @@ int main(void) {
 #pragma vector=PORT4_VECTOR
 __interrupt void RF_Wakeup_ISR(void) {
 	// RF wakeup is in port 4.5 and it is the only pin in that port that could cause interrupts
-	setup_crystal(); // turn on 12MHz crystal and switch clocks to use it
+	setup_fake_crystal(); // turn on 12MHz crystal and switch clocks to use it
 
 	// turn off interrupt flag
 	P4IFG &= ~BIT5;

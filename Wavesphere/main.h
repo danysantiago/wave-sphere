@@ -25,7 +25,7 @@ void status_service(void);
 /**
  * System Mode Constants
  */
-#define M_DIAGNOSTIC_CLEAR 0
+#define M_DIAGNOSTIC_CLEAR 8
 #define M_DIAGNOSTIC_SET 1
 #define M_RETRIEVAL_SET 2
 #define M_SAMPLING_SET 3
@@ -52,6 +52,7 @@ void shutdown_xbee(void);
 void shutdown_gps(void);
 void wakeup_gps(void);
 void initialize_xbee(void);
+int xbee_signal_strength(void);
 
 
 #endif

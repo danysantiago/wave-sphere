@@ -35,7 +35,7 @@ void getAccData(int *dataArr) {
 	volatile unsigned int i = 0;
 	//unsigned int dataArr[3];
 
-	while (i < 8) {
+	while (i < 4) {
 
 		ADC12CTL3 &= ~0x1F; // Set starting measurement to 0
 		ADC12CTL0 |= ADC12ENC | ADC12SC;        // Start sampling/conversion
@@ -64,9 +64,9 @@ void getAccData(int *dataArr) {
 		i = i + 1;
 	}
 
-	dataArr[0] = xSample >> 3;
-	dataArr[1] = ySample >> 3;
-	dataArr[2] = zSample >> 3;
+	dataArr[0] = xSample >> 2;
+	dataArr[1] = ySample >> 2;
+	dataArr[2] = zSample >> 2;
 }
 
 void accSleep() {

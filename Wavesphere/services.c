@@ -119,7 +119,7 @@ void sampling_service(bool diagnostic) {
 		init_sd(0, &fs);
 		spi_select(SD_DEVICE);
 	}
-	for(i = 30 * 250; i > 0; i--) {
+	for(i = 6011; i > 0; i--) {
 		TB0CCTL0 = CCIE; // all other 0, compare mode
 		__bis_SR_register(LPM0_bits + GIE);
 		_nop();
@@ -142,9 +142,13 @@ void sampling_service(bool diagnostic) {
 			if(fillbuffer(buffer, buffer2, magArr, timestamp, true, false)) {
 				dump_sd(buffer, buffer2, sector_count++);
 			}
+			/*fillbuffer2(accArr, timestamp, false, true);
+			fillbuffer2(gyroArr, timestamp, false, false);
+			fillbuffer2(magArr, timestamp, true, false);*/
 		} else {
 			i++; // loop forever
 			if(!system_flags.diagnostic_flag) {
+				shutdown_gps();
 				break;
 			}
 
@@ -163,6 +167,10 @@ void sampling_service(bool diagnostic) {
 					}
 				}
 			}
+			if(!system_flags.diagnostic_flag) {
+				shutdown_gps();
+				break;
+			}
 			// send stuff through UART
 			sendSensorDataUART(accArr, "");
 			sendStringUART("\t");
@@ -171,12 +179,19 @@ void sampling_service(bool diagnostic) {
 			sendSensorDataUART(magArr, "");
 			sendStringUART("\n");
 
+			if(!system_flags.diagnostic_flag) {
+				shutdown_gps();
+				break;
+			}
+
 			// file system information
 			sendStringUART("78%m\n");
 			// measurment from power meter
 			sendStringUART("44%b\n");
 			// xbee module signal
-			sendStringUART("-70dB\n");
+			//int signal = xbee_signal_strength();
+			//sendWordUART(signal);
+			sendStringUART("50dB\n");
 		}
 	}
 

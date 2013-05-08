@@ -11,6 +11,7 @@
 void sendSensorDataUART(int *arr, char *dataLabel);
 void sendByteUART(unsigned char byte);
 void sendStringUART(char *string);
+void sendWordUART(int data);
 
 
 #endif /* UART_H_ */

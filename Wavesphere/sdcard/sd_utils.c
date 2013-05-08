@@ -56,7 +56,26 @@ void unmount_file_sd(void) {
 	while(pf_mount(NULL));
 	return;
 }
+/*
+void fillbuffer2(int *arr, unsigned long timestamp, bool final_array, bool writetimestamp) {
+	char timestampString[13];
+	char buffer[48];
+	int i;
 
+	//timestamp -= 2;
+	ltoa(timestamp, timestampString);
+	i = 0;
+	while(timestampString[i++]);
+	i--;
+	timestampString[i++] = '\t';
+	timestampString[i++] = '\0';
+	timestampString[i] = '\0';
+	sprintf(buffer, "%s%d, %d, %d%s", writetimestamp ? timestampString : "",
+			arr[0], arr[1], arr[2], final_array ? "\r\n" : "\t");
+	// thing stored in buffer, write to sd card
+	write_sd(buffer);
+}
+*/
 bool fillbuffer(char *buffer, char *buffer2, int *arr, unsigned long timestamp,
 		bool final_array, bool writetimestamp) {
 	unsigned int buffer_length = strlen(buffer);
