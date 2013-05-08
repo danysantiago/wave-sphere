@@ -28,7 +28,7 @@ void setup_rfwakeup(void) {
 
 	// R4
 	spi_select(RF_DEVICE);
-	sendByteWithAddressSPI(0x04, 0x3F); // max damp resistance and max gain reduction ? (seems to not do anything)
+	sendByteWithAddressSPI(0x04, 0x3F); // max damp resistance and max gain reduction
 	spi_deselect(RF_DEVICE);
 
 	// R7

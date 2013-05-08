@@ -116,56 +116,5 @@ void i2c_read_mult_bytes(const unsigned char slaveAddr, const unsigned char byte
 
 
 	while (UCB0CTLW0 & UCTXSTP);
-	//UCB0IFG &= ~(UCSTPIFG + UCBIT9IFG);
 
 }
-
-/**
- * spi_setspeed() - set new clock divider for USCI
- *
- * USCI speed is based on the SMCLK divided by BR0 and BR1
- * initially we start slow (400kHz) to conform to SDCard
- * specifications then we speed up once initialized (16Mhz)
- *
- *//*
-void spi_set_divisor(const uint16_t clkdiv) {
-	UCA0CTL1 |= UCSWRST;		// go into reset state
-	UCA0BR0 = LOBYTE(clkdiv);
-	UCA0BR1 = HIBYTE(clkdiv);
-	UCA0CTL1 &= ~UCSWRST;		// release for operation
-}*/
-
-/*#pragma vector = USCI_B0_VECTOR
-__interrupt void USCI_B0_ISR(void) {
-	switch (__even_in_range(UCB0IV, 12)) {
-	case 0:
-		break;                           // Vector  0: No interrupts
-	case 2:
-		break;                           // Vector  2: ALIFG
-	case 4:
-		break;                           // Vector  4: NACKIFG
-	case 6:
-		break;   		                // Vector  6: STTIFG
-	case 8:
-		break;                           // Vector  8: STPIFG
-	case 10:                                  // Vector 10: RXIFG
-		RXData = UCB0RXBUF;					//take data from rxbuf
-		//RXByteCtr--;
-		UCB0IFG &= ~UCRXIFG;					//clear rxifg
-		__bic_SR_register_on_exit(LPM0_bits + GIE);
-		break;
-	case 12:                                  // Vector 12: TXIFG
-		if (TXByteCtr) {
-			UCB0TXBUF = TXData;				//But tx in txbuf
-			TXByteCtr = TXByteCtr - 1;
-		} else {
-			UCB0IFG &= ~UCTXIFG;			//clear txifg
-			UCB0CTL1 &= ~UCTR;				//change to receiver mode
-			UCB0CTL1 |= UCTXSTT;			// send start bit
-		}
-		break;
-	default:
-		break;
-	}
-}
-*/

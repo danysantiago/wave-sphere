@@ -19,11 +19,5 @@ void getGyroData(int *dataArray) {
 	dataArray[0] = (int) ((gyroArr[0] << 8) | gyroArr[1]);
 	dataArray[1] = (int) ((gyroArr[2] << 8) | gyroArr[3]);
 	dataArray[2] = (int) ((gyroArr[4] << 8) | gyroArr[5]);
-
-	/*
-	dataArray[0] = (int) ((gyroArr[1] << 8) | gyroArr[0]);
-	dataArray[1] = (int) ((gyroArr[3] << 8) | gyroArr[2]);
-	dataArray[2] = (int) ((gyroArr[5] << 8) | gyroArr[4]);
-	*/
 }
 
