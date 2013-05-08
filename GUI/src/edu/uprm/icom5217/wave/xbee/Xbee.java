@@ -24,7 +24,7 @@ public enum Xbee {
 	}
 
 	private class lang{
-		private static final char STOP_DIAGNOSTIC_MODE = 0;
+		private static final char STOP_DIAGNOSTIC_MODE = 8;
 		private static final char DIAGNOSTIC_MODE = 1;
 		private static final char RETRIEVAL_MODE = 2;	
 		private static final char SAMPLING_MODE = 3;

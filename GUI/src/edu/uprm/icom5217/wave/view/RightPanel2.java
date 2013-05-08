@@ -12,6 +12,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
 import edu.uprm.icom5217.wave.WaveSphere;
+import edu.uprm.icom5217.wave.model.SphereList;
 import edu.uprm.icom5217.wave.utils.SampleFile;
 import edu.uprm.icom5217.wave.view.diagnostic.DiagnosticPanel;
 import edu.uprm.icom5217.wave.xbee.Xbee;
@@ -26,6 +27,7 @@ public class RightPanel2 extends JPanel {
 
 	public static RightPanel2 instance;
 	private SphereInfoPanel panel;
+	private JButton locateButton;
 
 	public static RightPanel2 getInstance(){
 		if(instance == null)
@@ -36,12 +38,13 @@ public class RightPanel2 extends JPanel {
 
 	private RightPanel2() {
 
-		setLayout(new MigLayout("fill", "[36.00,grow,center]", "[]5[]5[]5[][]"));
+		setLayout(new MigLayout("fill", "[36.00,grow,center]", "[]5[]5[]5[][][]"));
 		add(getPanel(), "cell 0 0,grow");
 		add(getRetrievalModeButton(), "cell 0 1");
 		add(getSamplingModeButton(), "cell 0 2");
 		add(getDiagnosticButton(), "cell 0 3");
-		add(getTurnOffButton(), "cell 0 4,alignx right");
+		add(getLocateButton(), "cell 0 4");
+		add(getTurnOffButton(), "cell 0 5,alignx right");
 	}
 	private JButton getRetrievalModeButton() {
 		if (retrievalModeButton == null) {
@@ -78,7 +81,9 @@ public class RightPanel2 extends JPanel {
 				public void actionPerformed(ActionEvent arg0) {
 					WaveSphere.serial.write(Xbee.DIAGNOSTIC_MODE);
 					WaveSphere.serial.setFlag(Xbee.DIAGNOSTIC_MODE);
-					MainWindow.setRightPanel(new DiagnosticPanel());
+					MainWindow.getInstance().getSplitPane().setRightComponent(DiagnosticPanel.getInstance());
+					MainWindow.getInstance().pack();
+					MainWindow.getInstance().pack();
 				}
 			});
 			diagnosticButton.setName("diagnosticButton");
@@ -92,8 +97,6 @@ public class RightPanel2 extends JPanel {
 				public void actionPerformed(ActionEvent e) {
 					WaveSphere.serial.write(Xbee.SAMPLING_MODE);
 					WaveSphere.serial.setFlag(Xbee.SAMPLING_MODE);
-					Calendar c = Calendar.getInstance();
-					WaveSphere.serial.write(Long.toString(c.getTimeInMillis()));
 					MainWindow.samplingMode();
 				}
 			});
@@ -135,5 +138,19 @@ public class RightPanel2 extends JPanel {
 			panel = new SphereInfoPanel();
 		}
 		return panel;
+	}
+	private JButton getLocateButton() {
+		if (locateButton == null) {
+			locateButton = new JButton("Locate Mode");
+			locateButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					MainWindow.setRightPanel(LocatePanel.getInstance());
+					WaveSphere.serial.setFlag(Xbee.LOCATE_MODE);
+					WaveSphere.serial.write(SphereList.getInstance().get(0).getId(), Xbee.LOCATE_MODE);
+				}
+			});
+			locateButton.setName("diagnosticButton");
+		}
+		return locateButton;
 	}
 }

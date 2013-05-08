@@ -31,8 +31,10 @@ public class LocatePanel extends JPanel {
 
 		return instance;
 	}
-
-
+	
+	public void reset(){
+		currentSphereIndex = 0;
+	}
 	private LocatePanel() {
 		setLayout(new MigLayout("fill", "[36.00,grow,center]", "[124.00,grow,bottom]5[55.00,top]5[66.00]5[][]"));
 		//add(getPanel(), "cell 0 0,grow");
@@ -65,7 +67,7 @@ public class LocatePanel extends JPanel {
 				public void actionPerformed(ActionEvent e) {
 					WaveSphere.serial.write(SphereList.getInstance().get(currentSphereIndex).getId(), Xbee.STOP_LOCATE_MODE);
 					WaveSphere.serial.setFlag(Xbee.STATUS_MODE);	
-					WaveSphere.serial.resetSamplingFlag();
+					reset();
 					MainWindow.normalMode();
 				}
 			});
@@ -75,8 +77,8 @@ public class LocatePanel extends JPanel {
 	}
 
 	public void setLabel(String s){
-		getTheCurentLocationLabel().setText("The current location of " + getCurrentSphere().getName() + "is: ");
 		locationLabel.setText(s);
+		getTheCurentLocationLabel().setText("The current location of " + getCurrentSphere().getName() + " is: ");
 	}
 	
 	public Sphere getCurrentSphere(){
@@ -92,7 +94,7 @@ public class LocatePanel extends JPanel {
 					if(currentSphereIndex >= SphereList.getInstance().getSize()) //last sphere
 					{
 						WaveSphere.serial.setFlag(Xbee.STATUS_MODE);	
-						WaveSphere.serial.resetSamplingFlag();
+						reset();
 						MainWindow.normalMode();
 					}
 					else

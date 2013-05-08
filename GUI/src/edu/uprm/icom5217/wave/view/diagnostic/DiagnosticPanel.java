@@ -33,7 +33,7 @@ public class DiagnosticPanel extends JPanel {
 	
 	private static DiagnosticPanel INSTANCE;
 	
-	public DiagnosticPanel() {
+	private DiagnosticPanel() {
 		setLayout(new MigLayout("", "[46.00][156.00,grow][118.00][46.00]", "[][][][][][][][][][]"));
 		add(getBatteryLabel(), "cell 1 0");
 		add(getBatteryValueLabel(), "cell 2 0");
@@ -102,49 +102,49 @@ public class DiagnosticPanel extends JPanel {
 	}
 	private JLabel getBatteryValueLabel() {
 		if (batteryValueLabel == null) {
-			batteryValueLabel = new JLabel("");
+			batteryValueLabel = new JLabel("                 ");
 			batteryValueLabel.setName("batteryValueLabel");
 		}
 		return batteryValueLabel;
 	}
 	private JLabel getMemoryValueLabel() {
 		if (memoryValueLabel == null) {
-			memoryValueLabel = new JLabel("");
+			memoryValueLabel = new JLabel("                     ");
 			memoryValueLabel.setName("memoryValueLabel");
 		}
 		return memoryValueLabel;
 	}
 	private JLabel getLocationValueLabel() {
 		if (locationValueLabel == null) {
-			locationValueLabel = new JLabel("");
+			locationValueLabel = new JLabel("                    ");
 			locationValueLabel.setName("locationValueLabel");
 		}
 		return locationValueLabel;
 	}
 	private JLabel getWirelssValueLabel() {
 		if (wirelssValueLabel == null) {
-			wirelssValueLabel = new JLabel("");
-			wirelssValueLabel.setName("wirelssValueLabel");
+			wirelssValueLabel = new JLabel("                   ");
+			wirelssValueLabel.setName("wirelssValueLabel"); 
 		}
 		return wirelssValueLabel;
 	}
 	private JLabel getAccelerationValueLabel() {
 		if (accelerationValueLabel == null) {
-			accelerationValueLabel = new JLabel("");
+			accelerationValueLabel = new JLabel("                    ");
 			accelerationValueLabel.setName("accelerationValueLabel");
 		}
 		return accelerationValueLabel;
 	}
 	private JLabel getGyroValueLabel() {
 		if (gyroValueLabel == null) {
-			gyroValueLabel = new JLabel("");
+			gyroValueLabel = new JLabel("                 ");
 			gyroValueLabel.setName("gyroValueLabel");
 		}
 		return gyroValueLabel;
 	}
 	private JLabel getMagneticValueLabel() {
 		if (magneticValueLabel == null) {
-			magneticValueLabel = new JLabel("");
+			magneticValueLabel = new JLabel("                 ");
 			magneticValueLabel.setName("magneticValueLabel");
 		}
 		return magneticValueLabel;
@@ -183,32 +183,31 @@ public class DiagnosticPanel extends JPanel {
 	}
 	public void setBatteryValueLabel(String s) {
 		batteryValueLabel.setText(s);
-		batteryValueLabel.paintImmediately(batteryValueLabel.getVisibleRect());
+		//batteryValueLabel.paintImmediately(batteryValueLabel.getVisibleRect());
 	}
 	public void setMemoryValueLabel(String s) {
 		memoryValueLabel.setText(s);
-		memoryValueLabel.paintImmediately(memoryValueLabel.getVisibleRect());
+		//memoryValueLabel.paintImmediately(memoryValueLabel.getVisibleRect());
 	}
 	public void setLocationValueLabel(String s) {
 		locationValueLabel.setText(s);
-		locationValueLabel.paintImmediately(locationValueLabel.getVisibleRect());
+		//locationValueLabel.paintImmediately(locationValueLabel.getVisibleRect());
 	}
 	public void setWirelssValueLabel(String s) {
 		wirelssValueLabel.setText(s);
-		wirelssValueLabel.paintImmediately(wirelssValueLabel.getVisibleRect());
+		//wirelssValueLabel.paintImmediately(wirelssValueLabel.getVisibleRect());
 	}
 	public void setAccelerationValueLabel(String s) {
 		accelerationValueLabel.setText(s);
-		accelerationValueLabel.paintImmediately(accelerationValueLabel.getVisibleRect());
+		//accelerationValueLabel.paintImmediately(accelerationValueLabel.getVisibleRect());
 	}
 	public void setGyroValueLabel(String s) {
 		gyroValueLabel.setText(s);
-		gyroValueLabel.paintImmediately(gyroValueLabel.getVisibleRect());
+		//gyroValueLabel.paintImmediately(gyroValueLabel.getVisibleRect());
 	}
 	public void setMagneticValueLabel(String s) {
 		magneticValueLabel.setText(s);
-		System.out.println(s);
-		magneticValueLabel.paintImmediately(magneticValueLabel.getVisibleRect());
+		//magneticValueLabel.paintImmediately(magneticValueLabel.getVisibleRect());
 	}
 	
 	

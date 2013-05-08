@@ -39,7 +39,7 @@ public class SphereInfoPanel extends JPanel {
 
 	private JLabel getIdNumberValueLabel() {
 		if (IdNumberValueLabel == null) {
-			IdNumberValueLabel = new JLabel("          ");
+			IdNumberValueLabel = new JLabel("       ");
 			IdNumberValueLabel.setFont(new Font("Tahoma", Font.ITALIC, 11));
 			IdNumberValueLabel.setName("ldNumberValueLabel");
 		}

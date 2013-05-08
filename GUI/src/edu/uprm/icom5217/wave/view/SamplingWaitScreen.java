@@ -24,9 +24,15 @@ public class SamplingWaitScreen extends JPanel{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 		   getProgressBar().setValue(++count);
-		   if(count > 45){
-			   MainWindow.getInstance().getSplitPane().setRightComponent(LocatePanel.getInstance());
-			   WaveSphere.serial.write(SphereList.getInstance().get(0).getId(), Xbee.STOP_LOCATE_MODE);
+
+		   if(count > 60){
+			   
+			   //check which one works
+			   //MainWindow.getInstance().getSplitPane().setRightComponent(LocatePanel.getInstance());
+
+			   MainWindow.setRightPanel(LocatePanel.getInstance());
+
+			   WaveSphere.serial.write(SphereList.getInstance().get(0).getId(), Xbee.LOCATE_MODE);
 			   done();
 		   }
 		}
@@ -47,7 +53,7 @@ public class SamplingWaitScreen extends JPanel{
 	private static JProgressBar getProgressBar() {
 		if (progressBar == null) {
 			progressBar = new JProgressBar();
-			progressBar.setMaximum(45);
+			progressBar.setMaximum(60);
 			progressBar.setName("progressBar");
 		}
 		return progressBar;

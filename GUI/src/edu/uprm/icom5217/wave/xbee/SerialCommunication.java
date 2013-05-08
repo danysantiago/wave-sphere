@@ -33,8 +33,6 @@ public class SerialCommunication implements SerialPortEventListener {
 
 	public Xbee flag;
 
-	private boolean samplingFirstTime = true;
-
 	private  InputStream inputStream;
 	private  PrintStream outputStream;
 
@@ -55,10 +53,6 @@ public class SerialCommunication implements SerialPortEventListener {
 
 	public void setFlag(Xbee command) {
 		this.flag = command;
-	}
-
-	public void resetSamplingFlag(){
-		this.samplingFirstTime = true;
 	}
 
 	public  void openSerialPort(String port, int baudRate) throws PortInUseException, UnsupportedCommOperationException, TooManyListenersException, IOException {
@@ -174,6 +168,10 @@ public class SerialCommunication implements SerialPortEventListener {
 						samplingMode(c);
 						break;
 
+					case LOCATE_MODE:
+						samplingMode(c);
+						break;
+
 					case DIAGNOSTIC_MODE:
 						diagnosticMode(c);
 						break;
@@ -204,9 +202,9 @@ public class SerialCommunication implements SerialPortEventListener {
 				double[] accData = SensorDataConversion.convertAccData(acc);
 				double[] gyrData = SensorDataConversion.convertGyrData(gyro);
 				double[] magData = SensorDataConversion.convertMagData(mag);
-				
-				f.writeToFile(time + ",");
-				
+
+				f.writeToFile(time + ", ");
+
 				f.writeToFile((SensorDataConversion.AXIS_LABEL[0] + ": " + String.format("%.3f", accData[0]) + ", ")
 						+ (SensorDataConversion.AXIS_LABEL[1] + ": " + String.format("%.3f", accData[1]) + " , ")
 						+ (SensorDataConversion.AXIS_LABEL[2] + ": " + String.format("%.3f", accData[2]) + ","));
@@ -234,7 +232,7 @@ public class SerialCommunication implements SerialPortEventListener {
 		}
 	}
 
-	private void diagnosticMode(char c) {
+	private void diagnosticMode(char c) throws IOException {
 		sb.append(c);
 		if(c=='\n'){
 
@@ -255,8 +253,9 @@ public class SerialCommunication implements SerialPortEventListener {
 					//}
 				}
 			}
-			else if(s.contains("dB"))
-				DiagnosticPanel.getInstance().setWirelssValueLabel(s);
+			else if(s.contains("dB")){
+				DiagnosticPanel.getInstance().setWirelssValueLabel("-" + Long.parseLong(s.substring(0,2),16) + "dB");
+				}
 			else if(s.contains("%b"))
 				DiagnosticPanel.getInstance().setBatteryValueLabel(s.substring(0,s.length()-2));
 			else if(s.contains("%m"))
@@ -299,10 +298,6 @@ public class SerialCommunication implements SerialPortEventListener {
 	}
 
 	private void samplingMode(char c) {
-		if(samplingFirstTime){
-			MainWindow.getInstance().getSplitPane().setRightComponent(LocatePanel.getInstance());
-			samplingFirstTime = false;
-		}
 		sb.append(c);
 		if(c=='\n'){
 			String s = sb.toString();
@@ -317,6 +312,7 @@ public class SerialCommunication implements SerialPortEventListener {
 										+ Float.toString(Float.parseFloat(st[5].substring(3))/60)) : "000.0000") + st[6];
 
 				LocatePanel.getInstance().setLabel(s);
+
 				//}
 			}
 			sb = new StringBuilder();
@@ -325,19 +321,17 @@ public class SerialCommunication implements SerialPortEventListener {
 	}
 
 	private void statusMode(char c) {
-		WaveSphere.serial.write(Xbee.STOP_DIAGNOSTIC_MODE);
-		//WaveSphere.serial.write(Xbee.STOP_LOCATE_MODE);
 		sb.append(c);
 		if(c=='\n'){
 
 			String s = sb.toString();
 
-			
+
 			if(s.contains("%m"))
 				RightPanel2.getInstance().setMbLabel(s.substring(0, s.length()-2));
-			else if(s.matches("[0-9]{2}%b\\n"))
+			else if(s.matches("[0-9]{2}%b\\n")){
 				RightPanel2.getInstance().setBatteryLabel(s.substring(0, s.length()-2));
-			else
+				}
 			{
 				if(s.matches("[0-9]{3}-[0-9]{4}\\n"))
 					RightPanel2.getInstance().setBolaIdLabel(s);
@@ -371,8 +365,8 @@ public class SerialCommunication implements SerialPortEventListener {
 
 	public void write(Xbee command){
 		if(!SphereList.getInstance().isEmpty()){
-		outputStream.print(SphereList.getInstance().getSelected().getId() + " " + command.getCommand());
-		outputStream.flush();
+			outputStream.print(SphereList.getInstance().getSelected().getId() + " " + command.getCommand());
+			outputStream.flush();
 		}
 	}
 
@@ -386,15 +380,11 @@ public class SerialCommunication implements SerialPortEventListener {
 		outputStream.print(s);
 		outputStream.flush();
 	}
-	
+
 	public void write(String string, Xbee command){
 		outputStream.print(string + " " + command.getCommand());
-		outputStream.flush();
-	}
 
-	public void write(Sphere sphere, Xbee stopLocateMode) {
-		// TODO Auto-generated method stub
-		
+		outputStream.flush();
 	}
 
 }
