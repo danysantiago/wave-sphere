@@ -2,7 +2,6 @@ package edu.uprm.icom5217.wave.xbee;
 
 
 import edu.uprm.icom5217.wave.WaveSphere;
-import edu.uprm.icom5217.wave.model.Sphere;
 import edu.uprm.icom5217.wave.model.SphereList;
 import edu.uprm.icom5217.wave.utils.SampleFile;
 import edu.uprm.icom5217.wave.utils.SensorDataConversion;

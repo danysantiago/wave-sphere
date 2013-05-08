@@ -36,10 +36,11 @@ public class SensorDataConversion {
 	
 	public static double[] convertMagData(String[] strData) {
 		double[] data = new double[3];
-		
 		for(int i = 0; i < 3; i++) {
 			data[i] = Double.parseDouble(strData[i].trim());
 			data[i] = data[i] / MAG_GAIN[i];
+			if(i!=2)
+				data[i] *= -1.0;
 		}
 		
 		return data;
