@@ -14,7 +14,7 @@ void initGyro() {
 void getGyroData(int *dataArray) {
 	unsigned char gyroArr[6];
 
-	i2c_read_mult_bytes(0x6A, 0xE8, 6, gyroArr);
+	i2c_read_mult_bytes(0x6A, 0xA8, 6, gyroArr);
 
 	dataArray[0] = (int) ((gyroArr[0] << 8) | gyroArr[1]);
 	dataArray[1] = (int) ((gyroArr[2] << 8) | gyroArr[3]);
