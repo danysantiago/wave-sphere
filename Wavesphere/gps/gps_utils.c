@@ -30,6 +30,11 @@ void send_string_gps(char *string) {
 void shutdown_gps(void) {
 	SoftSerial_init();
 	__delay_cycles(100001);
+	send_string_gps("hola");
+	send_string_gps("hola");
+	__delay_cycles(100001);
+	__delay_cycles(100001);
+	__delay_cycles(100001);
 	send_string_gps("$PMTK161,0*28\r\n");
 }
 

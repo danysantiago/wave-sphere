@@ -120,19 +120,23 @@ void shutdown_components(void) {
 
 int main(void) {
 	WDTCTL = WDTPW | WDTHOLD;		// Stop watchdog timer
-	default_clock_system();
+	__delay_cycles(1000000);
+	P2DIR |= BIT7;
+	P2OUT &= ~BIT7;
+	setup_fake_crystal();
 
 	shutdown_xbee();
 	_enable_interrupts();
 	shutdown_gps();
 	__delay_cycles(100001);
+	default_clock_system();
 
 	for(;;) {
-
 		setup_rfwakeup();
 		// at this point, the system is shut down with RF wakeup interrupts enabled.
 		__bis_SR_register(LPM4_bits+GIE); // rf wakeup will take it out of this very low power mode
 		P4IE &= ~BIT5; //Disable rf wakeup interrupt
+		P2OUT |= BIT7;
 		initialize_xbee(); // xbee must be turned on after the rf wakes up the system
 
 		for(;;) {
@@ -165,8 +169,11 @@ int main(void) {
 		}
 
 		// shutdown system
-		default_clock_system();
+
 		shutdown_components();
+		__delay_cycles(100001);
+		default_clock_system();
+		P2OUT &= ~BIT7;
 
 		// clear all flags
 		system_flags.diagnostic_flag = false;
